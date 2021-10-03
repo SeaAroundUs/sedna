@@ -69,4 +69,4 @@ def attach_policy_to_export_role(role, policy):
     iam = boto3.client('iam')
     # TODO boto3 has a bug where role_name is returning arn: https://github.com/boto/boto3/issues/3023
     # TODO check if its already attached? it doesn't error so it might be fine
-    iam.attach_role_policy(RoleName=role.role_name, PolicyArn=policy.arn)
+    iam.attach_role_policy(RoleName=EXPORT_ROLE_NAME, PolicyArn=policy.arn)
