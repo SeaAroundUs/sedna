@@ -5,8 +5,9 @@ import sedna.rds as rds
 
 
 def main():
-    # athena.create_tables()
-    # exit(0)
+    athena.create_database()
+    athena.create_tables()
+    exit(0)
 
     policy = iam.get_or_create_export_policy()
     role = iam.get_or_create_export_role()

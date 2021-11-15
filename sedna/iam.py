@@ -1,9 +1,7 @@
 import boto3
 import json
-from sedna.common import SEDNA_TAGS
+from sedna.common import SEDNA_TAGS, EXPORT_POLICY_NAME, EXPORT_ROLE_NAME
 
-EXPORT_POLICY_NAME = 'sedna-export-policy'
-EXPORT_ROLE_NAME = 'sedna-export-role'
 EXPORT_POLICY_DOCUMENT = {
     "Version": "2012-10-17",
     "Statement": [{

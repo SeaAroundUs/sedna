@@ -1,9 +1,6 @@
 import boto3
-from sedna.common import BUCKET_NAME, REGION_NAME, EXPORT_S3_PATH
-
-SNAPSHOT_NAME = 'sedna-catshark-dev'
-EXPORT_DB_PATH = ['seaaroundus']  # TODO might be sau_int on prod, might want to use fewer tables
-EXPORT_TASK_NAME = 'sedna-sau-int-export'
+from sedna.common import BUCKET_NAME, REGION_NAME, EXPORT_S3_PATH, \
+    SNAPSHOT_NAME, EXPORT_DB_PATH, EXPORT_TASK_NAME
 
 
 def should_start_export(snapshot_arn):

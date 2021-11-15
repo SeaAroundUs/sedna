@@ -1,9 +1,6 @@
 import boto3
 import json
-from sedna.common import SEDNA_TAGS, REGION_NAME
-
-EXPORT_KEY_NAME = 'sedna-export-key'
-KEY_DESCRIPTION = 'Key for encrypting RDS snapshot exports to S3'
+from sedna.common import SEDNA_TAGS, REGION_NAME, EXPORT_KEY_NAME, KEY_DESCRIPTION
 
 
 def get_or_create_export_key():

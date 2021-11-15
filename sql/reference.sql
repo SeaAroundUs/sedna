@@ -253,6 +253,7 @@ FROM geo.fao_map;
 SELECT year, fishing_entity_id, taxon_key, price
 FROM master.price;
 
+-- TODO we need to import this view separately
 -- allocation.v_internal_generate_allocation_simple_area_table -> imported.AllocationSimpleArea
 SELECT marine_layer_id,
        area_id,
