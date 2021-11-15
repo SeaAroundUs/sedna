@@ -5,6 +5,15 @@ CREATE EXTENSION IF NOT EXISTS aws_s3 CASCADE;
 -- original query source:
 -- https://github.com/SeaAroundUs/Merlin-database-mssql/blob/master/sprocs.sql#L1164
 
+-- required function
+CREATE OR REPLACE FUNCTION generate_simple_acronym(i_phrase text)
+returns text AS
+$f$
+  select strings(substr(t.w,1,1) order by t.ord)
+    from unnest(string_to_array(i_phrase, ' ')) with ordinality as t(w, ord);
+$f$
+LANGUAGE sql;
+
 -- master.access_agreement -> dbo.AgreementRaw
 SELECT id,
        fishing_entity_id,

@@ -1,5 +1,6 @@
 import boto3
 import json
+from sedna.common import SEDNA_TAGS
 
 EXPORT_POLICY_NAME = 'sedna-export-policy'
 EXPORT_ROLE_NAME = 'sedna-export-role'
@@ -43,7 +44,7 @@ def get_or_create_export_policy():
             PolicyName=EXPORT_POLICY_NAME,
             PolicyDocument=json.dumps(EXPORT_POLICY_DOCUMENT),
             Description='Allows RDS exports to be saved to S3',
-            Tags=[{'Key': 'project', 'Value': 'sedna'}]
+            Tags=SEDNA_TAGS
         )
         arn = policy['Policy']['Arn']
     return boto3.resource('iam').Policy(arn)
@@ -59,7 +60,7 @@ def get_or_create_export_role():
             RoleName=EXPORT_ROLE_NAME,
             AssumeRolePolicyDocument=json.dumps(EXPORT_ROLE_DOCUMENT),
             Description='Role for exporting RDS exports to S3',
-            Tags=[{'Key': 'project', 'Value': 'sedna'}]
+            Tags=SEDNA_TAGS
         )
         arn = role['Role']['Arn']
     return boto3.resource('iam').Role(arn)
