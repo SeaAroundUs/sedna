@@ -31,4 +31,4 @@ def start_export(snapshot_arn, role_arn, kms_key_id):
         ExportOnly=EXPORT_DB_PATH
     )
 
-# TODO may also need to export a CSV of any views
+# TODO will also need to export a CSV of allocation.v_internal_generate_allocation_simple_area_table

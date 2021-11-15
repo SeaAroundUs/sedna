@@ -21,10 +21,11 @@ def create_database():
 def create_tables():
     print('Creating tables in Athena...')
     for schema in ['allocation', 'distribution', 'geo', 'master', 'recon']:
-        print('-- {} --'.format(schema))
-        queries = read_sql_file('tables/{}.sql'.format(schema)).split(';')[:-1]
+        print(f'-- {schema} --')
+        queries = read_sql_file(f'tables/{schema}.sql').split(';')[:-1]
         for sql in queries:
-            print('{}'.format(sql.split('\n')[0]).replace('-- ', ''))
+            table_name = sql.split('\n')[0].replace('-- ', '')
+            print(f'Creating {table_name}...')
             # run_query(sql)
 
 

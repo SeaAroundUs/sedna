@@ -6,11 +6,14 @@ REGION_NAME = 'us-west-2'
 
 # s3
 BUCKET_NAME = 'sedna-catshark-storage'
-EXPORT_S3_PATH = 'sedna-exports'
+
+# athena
+RESULT_CONFIGURATION = {'OutputLocation': f's3://{BUCKET_NAME}/query_results/'}
 
 # rds
-RESULT_CONFIGURATION = {'OutputLocation': 's3://{}/query_results/'.format(BUCKET_NAME)}
-PARQUET_PREFIX = '{}/sedna-sau-int-export/seaaroundus/'.format(EXPORT_S3_PATH)
+EXPORT_S3_PATH = 'sedna-exports'
+EXPORT_TASK_NAME = 'sedna-sau-int-export'
+PARQUET_PREFIX = f'{EXPORT_S3_PATH}/{EXPORT_TASK_NAME}/seaaroundus/'  # TODO change to sau_int on prod
 SNAPSHOT_NAME = 'sedna-catshark-dev'
 EXPORT_DB_PATH = [  # TODO change to sau_int on prod
     'seaaroundus.allocation',
@@ -19,7 +22,6 @@ EXPORT_DB_PATH = [  # TODO change to sau_int on prod
     'seaaroundus.master',
     'seaaroundus.recon',
 ]
-EXPORT_TASK_NAME = 'sedna-sau-int-export'
 
 # iam
 EXPORT_POLICY_NAME = 'sedna-export-policy'
