@@ -2,6 +2,7 @@ import os
 
 # shared
 SEDNA_TAGS = [{'TagKey': 'project', 'TagValue': 'sedna'}]
+SEDNA_ALT_TAGS = [{'Key': 'project', 'Value': 'sedna'}]
 REGION_NAME = 'us-west-2'
 
 # s3
@@ -12,9 +13,11 @@ RESULT_CONFIGURATION = {'OutputLocation': f's3://{BUCKET_NAME}/query_results/'}
 
 # rds
 EXPORT_S3_PATH = 'sedna-exports'
-EXPORT_TASK_NAME = 'sedna-sau-int-export'
+with open('export_version') as f:
+    EXPORT_TASK_NAME = f'sedna-sau-int-export-{f.readline().strip()}'
 PARQUET_PREFIX = f'{EXPORT_S3_PATH}/{EXPORT_TASK_NAME}/seaaroundus/'  # TODO change to sau_int on prod
-SNAPSHOT_NAME = 'sedna-catshark-dev'
+DATABASE_ID = 'sedna-catshark-dev'
+SNAPSHOT_ID = 'sedna-snapshot'
 EXPORT_DB_PATH = [  # TODO change to sau_int on prod
     'seaaroundus.allocation',
     'seaaroundus.distribution',
