@@ -13,7 +13,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.access_agreement (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/master.access_agreement'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/master.access_agreement'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- master.catch_type
@@ -56,5 +56,5 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.taxon (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/master.taxon'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/master.taxon'
 TBLPROPERTIES ('has_encrypted_data'='false');

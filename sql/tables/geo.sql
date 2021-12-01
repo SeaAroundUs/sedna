@@ -11,7 +11,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.big_cell (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.big_cell'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.big_cell'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.big_cell_type
@@ -21,7 +21,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.big_cell_type (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.big_cell_type'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.big_cell_type'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.cell
@@ -32,7 +32,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.cell (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.cell'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.cell'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.cell_is_coastal
@@ -41,7 +41,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.cell_is_coastal (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.cell_is_coastal'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.cell_is_coastal'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.depth_adjustment_row_cell
@@ -52,7 +52,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.depth_adjustment_row_cell (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.depth_adjustment_row_cell'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.depth_adjustment_row_cell'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.eez_big_cell_combo
@@ -65,7 +65,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.eez_big_cell_combo (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.eez_big_cell_combo'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.eez_big_cell_combo'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.eez_ccamlr_combo
@@ -78,7 +78,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.eez_ccamlr_combo (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.eez_ccamlr_combo'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.eez_ccamlr_combo'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.eez_fao_combo
@@ -90,7 +90,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.eez_fao_combo (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.eez_fao_combo'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.eez_fao_combo'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.eez_ices_combo
@@ -103,7 +103,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.eez_ices_combo (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.eez_ices_combo'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.eez_ices_combo'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.eez_nafo_combo
@@ -116,7 +116,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.eez_nafo_combo (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.eez_nafo_combo'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.eez_nafo_combo'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.fao_cell
@@ -126,7 +126,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.fao_cell (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.fao_cell'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.fao_cell'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.fao_map
@@ -137,7 +137,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.fao_map (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.fao_map'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.fao_map'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.ifa_fao
@@ -147,7 +147,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.ifa_fao (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.ifa_fao'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.ifa_fao'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- geo.simple_area_cell_assignment_raw
@@ -161,5 +161,5 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.simple_area_cell_assignment_raw (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/geo.simple_area_cell_assignment_raw'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/geo.simple_area_cell_assignment_raw'
 TBLPROPERTIES ('has_encrypted_data'='false');

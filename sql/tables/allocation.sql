@@ -6,7 +6,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.allocation_area_type (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/allocation.allocation_area_type'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/allocation.allocation_area_type'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- allocation.ices_area
@@ -17,7 +17,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.ices_area (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/allocation.ices_area'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/allocation.ices_area'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- allocation.layer
@@ -27,5 +27,5 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.layer (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/allocation.layer'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/allocation.layer'
 TBLPROPERTIES ('has_encrypted_data'='false');

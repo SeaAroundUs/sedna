@@ -7,7 +7,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.taxon_distribution (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/distribution.taxon_distribution'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/distribution.taxon_distribution'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
 -- distribution.taxon_distribution_substitute
@@ -17,5 +17,5 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.taxon_distribution_substitute (
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES ('serialization.format' = '1')
-LOCATION 's3://sedna-catshark-storage/sedna-export/sedna-sau-int-export/seaaroundus/distribution.taxon_distribution_substitute'
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/distribution.taxon_distribution_substitute'
 TBLPROPERTIES ('has_encrypted_data'='false');

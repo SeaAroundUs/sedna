@@ -27,7 +27,7 @@ def create_tables():
         for sql in queries:
             table_name = sql.strip().split('\n')[0].replace('-- ', '')
             print(f'Creating {table_name}...')
-            # run_query(sql)
+            run_query(sql)
 
 
 def test_tables():

@@ -15,7 +15,7 @@ RESULT_CONFIGURATION = {'OutputLocation': f's3://{BUCKET_NAME}/query_results/'}
 EXPORT_S3_PATH = 'sedna-exports'
 with open('export_version') as f:
     EXPORT_TASK_NAME = f'sedna-sau-int-export-{f.readline().strip()}'
-PARQUET_PREFIX = f'{EXPORT_S3_PATH}/{EXPORT_TASK_NAME}/seaaroundus/'  # TODO change to sau_int on prod
+PARQUET_PREFIX = f'{EXPORT_S3_PATH}/{EXPORT_TASK_NAME}/seaaroundus'  # TODO change to sau_int on prod
 DATABASE_ID = 'sedna-catshark-dev'
 SNAPSHOT_ID = 'sedna-snapshot'
 EXPORT_DB_PATH = [  # TODO change to sau_int on prod
@@ -35,8 +35,11 @@ EXPORT_KEY_NAME = 'sedna-export-key'
 KEY_DESCRIPTION = 'Key for encrypting RDS snapshot exports to S3'
 
 
-def read_sql_file(filename):
+def read_sql_file(filename, replace=True):
     this_path = os.path.dirname(__file__)
     abs_path = os.path.join(this_path, '../sql', filename)
     fd = open(abs_path)
-    return fd.read()
+    sql = fd.read()
+    if replace:
+        sql = sql.format(BUCKET_NAME=BUCKET_NAME, PARQUET_PREFIX=PARQUET_PREFIX)
+    return sql
