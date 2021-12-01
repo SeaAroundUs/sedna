@@ -1,20 +1,23 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()  # bring in values from .env
 
 # shared
 SEDNA_TAGS = [{'TagKey': 'project', 'TagValue': 'sedna'}]
 SEDNA_ALT_TAGS = [{'Key': 'project', 'Value': 'sedna'}]
-REGION_NAME = 'us-west-2'
+REGION_NAME = os.getenv('REGION_NAME', 'us-west-2')
 
 # s3
-BUCKET_NAME = 'sedna-catshark-storage'
+BUCKET_NAME = os.getenv('BUCKET_NAME', 'sedna-catshark-storage')
 
 # athena
 RESULT_CONFIGURATION = {'OutputLocation': f's3://{BUCKET_NAME}/query_results/'}
 
 # rds
 EXPORT_S3_PATH = 'sedna-exports'
-EXPORT_DATABASE = 'seaaroundus'  # TODO change to sau_int on prod
-with open('export_version') as f:
+EXPORT_DATABASE = os.getenv('EXPORT_DATABASE', 'seaaroundus')
+with open('.export_version') as f:
     EXPORT_TASK_NAME = f'sedna-sau-int-export-{f.readline().strip()}'
 PARQUET_PREFIX = f'{EXPORT_S3_PATH}/{EXPORT_TASK_NAME}/{EXPORT_DATABASE}'
 DATABASE_ID = 'sedna-catshark-dev'
