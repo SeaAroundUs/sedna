@@ -14,6 +14,7 @@ def get_query_results(qid):
 
 
 def create_database():
+    print('Creating database in Athena...')
     return run_query(read_sql_file('create_database.sql'))
 
 
@@ -24,9 +25,12 @@ def create_tables():
         print(f'-- {schema} --')
         queries = read_sql_file(f'tables/{schema}.sql').split(';')[:-1]
         for sql in queries:
-            table_name = sql.split('\n')[0].replace('-- ', '')
+            table_name = sql.strip().split('\n')[0].replace('-- ', '')
             print(f'Creating {table_name}...')
             # run_query(sql)
 
+
+def test_tables():
+    pass
 
 # TODO need to create a data catalog?

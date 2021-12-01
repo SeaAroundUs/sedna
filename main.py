@@ -11,11 +11,10 @@ def main():
     key_id = kms.get_or_create_export_key()
     snapshot_arn = rds.get_or_create_snapshot()
     rds.get_or_create_export(snapshot_arn, role.name, key_id)
-    print('export complete! ready for athena work')
-    exit(0)
     athena.create_database()
-    # athena.create_tables()
-    # exit(0)
+    athena.create_tables()
+    athena.test_tables()
+    exit(0)
 
 
 if __name__ == '__main__':
