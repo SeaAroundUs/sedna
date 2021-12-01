@@ -13,17 +13,18 @@ RESULT_CONFIGURATION = {'OutputLocation': f's3://{BUCKET_NAME}/query_results/'}
 
 # rds
 EXPORT_S3_PATH = 'sedna-exports'
+EXPORT_DATABASE = 'seaaroundus'  # TODO change to sau_int on prod
 with open('export_version') as f:
     EXPORT_TASK_NAME = f'sedna-sau-int-export-{f.readline().strip()}'
-PARQUET_PREFIX = f'{EXPORT_S3_PATH}/{EXPORT_TASK_NAME}/seaaroundus'  # TODO change to sau_int on prod
+PARQUET_PREFIX = f'{EXPORT_S3_PATH}/{EXPORT_TASK_NAME}/{EXPORT_DATABASE}'
 DATABASE_ID = 'sedna-catshark-dev'
 SNAPSHOT_ID = 'sedna-snapshot'
-EXPORT_DB_PATH = [  # TODO change to sau_int on prod
-    'seaaroundus.allocation',
-    'seaaroundus.distribution',
-    'seaaroundus.geo',
-    'seaaroundus.master',
-    'seaaroundus.recon',
+EXPORT_DB_PATH = [
+    f'{EXPORT_DATABASE}.allocation',
+    f'{EXPORT_DATABASE}.distribution',
+    f'{EXPORT_DATABASE}.geo',
+    f'{EXPORT_DATABASE}.master',
+    f'{EXPORT_DATABASE}.recon',
 ]
 
 # iam
