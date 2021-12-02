@@ -1,3 +1,4 @@
+import boto3
 import os
 from dotenv import load_dotenv
 
@@ -7,6 +8,7 @@ load_dotenv()  # bring in values from .env
 SEDNA_TAGS = [{'TagKey': 'project', 'TagValue': 'sedna'}]
 SEDNA_ALT_TAGS = [{'Key': 'project', 'Value': 'sedna'}]
 REGION_NAME = os.getenv('REGION_NAME', 'us-west-2')
+ACCOUNT_ID = boto3.client('sts').get_caller_identity()['Account']
 
 # s3
 BUCKET_NAME = os.getenv('BUCKET_NAME', 'sedna-catshark-storage')
@@ -30,9 +32,16 @@ EXPORT_DB_PATH = [
     f'{EXPORT_DATABASE}.recon',
 ]
 
+# direct db connection
+EXPORT_HOST = os.getenv('EXPORT_HOST')
+EXPORT_USER = os.getenv('EXPORT_USER')
+EXPORT_PASSWORD = os.getenv('EXPORT_PASSWORD')
+
 # iam
 EXPORT_POLICY_NAME = 'sedna-export-policy'
 EXPORT_ROLE_NAME = 'sedna-export-role'
+RDS_TO_S3_POLICY_NAME = 'sedna-rds-to-s3-policy'
+RDS_TO_S3_ROLE_NAME = 'sedna-rds-to-s3-role'
 
 # kms
 EXPORT_KEY_NAME = 'sedna-export-key'

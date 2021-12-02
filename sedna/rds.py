@@ -1,6 +1,38 @@
 import boto3
-from sedna.common import BUCKET_NAME, REGION_NAME, EXPORT_S3_PATH, \
-    DATABASE_ID, SNAPSHOT_ID, EXPORT_DB_PATH, EXPORT_TASK_NAME, SEDNA_ALT_TAGS
+import psycopg2
+from sedna.common import BUCKET_NAME, REGION_NAME, EXPORT_S3_PATH, DATABASE_ID, \
+    SNAPSHOT_ID, EXPORT_DB_PATH, EXPORT_TASK_NAME,  EXPORT_HOST, EXPORT_USER, \
+    EXPORT_PASSWORD, EXPORT_DATABASE, PARQUET_PREFIX, SEDNA_ALT_TAGS
+
+
+def export_views():
+    conn = psycopg2.connect(
+        host=EXPORT_HOST,
+        user=EXPORT_USER,
+        password=EXPORT_PASSWORD,
+        dbname=EXPORT_DATABASE
+    )
+    with conn.cursor() as cur:
+        cur.execute('CREATE EXTENSION IF NOT EXISTS aws_s3 CASCADE;')
+        try:
+            print(cur.fetchone())  # TODO just need for debug?
+        except psycopg2.ProgrammingError:
+            pass  # print('No result from CREATE EXTENSION')
+        cur.execute(f'''
+            SELECT * FROM aws_s3.query_export_to_s3(
+                'SELECT * FROM v_internal_generate_allocation_simple_area_table', 
+                aws_commons.create_s3_uri(
+                    '{BUCKET_NAME}',
+                    '{PARQUET_PREFIX}/v_internal_generate_allocation_simple_area_table.csv',
+                    '{REGION_NAME}'
+                ),
+                options :='FORMAT CSV'
+            );        
+        ''')
+        try:
+            print(cur.fetchone())  # TODO just need for debug?
+        except psycopg2.ProgrammingError:
+            print('No result from query_export_to_s3')
 
 
 def get_or_create_snapshot():
