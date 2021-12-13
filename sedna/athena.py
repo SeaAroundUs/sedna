@@ -21,7 +21,7 @@ def create_database():
 # ddl for parquet tables: https://docs.aws.amazon.com/athena/latest/ug/parquet-serde.html
 def create_tables():
     print('Creating tables in Athena...')
-    for schema in ['allocation', 'distribution', 'geo', 'master', 'recon']:
+    for schema in ['allocation', 'distribution', 'geo', 'master', 'recon', 'views']:
         print(f'-- {schema} --')
         queries = read_sql_file(f'tables/{schema}.sql').split(';')[:-1]
         for sql in queries:
@@ -32,5 +32,3 @@ def create_tables():
 
 def test_tables():
     pass
-
-# TODO need to create a data catalog?

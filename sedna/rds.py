@@ -1,9 +1,14 @@
 import botocore
 import boto3
 import psycopg2
+import re
 from sedna.common import BUCKET_NAME, REGION_NAME, EXPORT_S3_PATH, DATABASE_ID, \
     SNAPSHOT_ID, EXPORT_DB_PATH, EXPORT_TASK_NAME,  EXPORT_HOST, EXPORT_USER, \
     EXPORT_PASSWORD, EXPORT_DATABASE, PARQUET_PREFIX, SEDNA_ALT_TAGS
+
+VIEWS_FOR_EXPORT = [
+    'allocation.v_internal_generate_allocation_simple_area_table',
+]
 
 
 def export_views():
@@ -15,17 +20,19 @@ def export_views():
     )
     with conn.cursor() as cur:
         cur.execute('CREATE EXTENSION IF NOT EXISTS aws_s3 CASCADE;')
-        cur.execute(f'''
-            SELECT * FROM aws_s3.query_export_to_s3(
-                'SELECT * FROM allocation.v_internal_generate_allocation_simple_area_table', 
-                aws_commons.create_s3_uri(
-                    '{BUCKET_NAME}',
-                    '{PARQUET_PREFIX}/v_internal_generate_allocation_simple_area_table.csv',
-                    '{REGION_NAME}'
-                ),
-                options :='FORMAT CSV'
-            );        
-        ''')
+        for view in VIEWS_FOR_EXPORT:
+            short_view_name = re.sub(r'(^\w+\.(v_)?)', '', view)
+            cur.execute(f'''
+                SELECT * FROM aws_s3.query_export_to_s3(
+                    'SELECT * FROM {view}',
+                    aws_commons.create_s3_uri(
+                        '{BUCKET_NAME}',
+                        '{PARQUET_PREFIX}/views.{short_view_name}/view.csv',
+                        '{REGION_NAME}'
+                    ),
+                    options :='FORMAT CSV'
+                );        
+            ''')
 
 
 def get_or_create_snapshot():

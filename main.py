@@ -27,7 +27,6 @@ def main():
     iam.attach_rds_to_s3_policy_to_role(rds_to_s3_policy)
     rds.attach_rds_to_s3_role_to_db(role)
     rds.export_views()
-    exit(0)  # TODO debug
 
     # athena setup
     athena.create_database()
