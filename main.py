@@ -23,8 +23,9 @@ def main():
 
     # view export
     rds_to_s3_policy = iam.get_or_create_rds_to_s3_policy()
-    iam.get_or_create_rds_to_s3_role()
+    role = iam.get_or_create_rds_to_s3_role()
     iam.attach_rds_to_s3_policy_to_role(rds_to_s3_policy)
+    rds.attach_rds_to_s3_role_to_db(role)
     rds.export_views()
     exit(0)  # TODO debug
 

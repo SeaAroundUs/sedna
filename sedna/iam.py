@@ -2,7 +2,7 @@ import boto3
 import json
 from sedna.common import SEDNA_ALT_TAGS, EXPORT_POLICY_NAME, EXPORT_ROLE_NAME, \
     RDS_TO_S3_POLICY_NAME, RDS_TO_S3_ROLE_NAME, BUCKET_NAME, REGION_NAME, \
-    EXPORT_DATABASE, ACCOUNT_ID
+    DATABASE_ID, ACCOUNT_ID
 
 EXPORT_POLICY_DOCUMENT = {
     "Version": "2012-10-17",
@@ -46,8 +46,7 @@ RDS_TO_S3_ROLE_DOCUMENT = {
         "Action": "sts:AssumeRole",
         "Condition": {
             "StringEquals": {
-                "aws:SourceAccount": ACCOUNT_ID,
-                "aws:SourceArn": f'arn:aws:rds:{REGION_NAME}:{ACCOUNT_ID}db:{EXPORT_DATABASE}'
+                "aws:SourceArn": f'arn:aws:rds:{REGION_NAME}:{ACCOUNT_ID}:db:{DATABASE_ID}'
             }
         }
     }]
@@ -100,7 +99,7 @@ def get_or_create_rds_to_s3_policy():
         policy = iam.create_policy(
             PolicyName=RDS_TO_S3_POLICY_NAME,
             PolicyDocument=json.dumps(RDS_TO_S3_POLICY_DOCUMENT),
-            Description='Allows aws_s3 extension to be save to S3',
+            Description='Allows aws_s3 extension to save to S3',
             Tags=SEDNA_ALT_TAGS
         )
         arn = policy['Policy']['Arn']

@@ -1,3 +1,4 @@
+import botocore
 import boto3
 import psycopg2
 from sedna.common import BUCKET_NAME, REGION_NAME, EXPORT_S3_PATH, DATABASE_ID, \
@@ -14,13 +15,9 @@ def export_views():
     )
     with conn.cursor() as cur:
         cur.execute('CREATE EXTENSION IF NOT EXISTS aws_s3 CASCADE;')
-        try:
-            print(cur.fetchone())  # TODO just need for debug?
-        except psycopg2.ProgrammingError:
-            pass  # print('No result from CREATE EXTENSION')
         cur.execute(f'''
             SELECT * FROM aws_s3.query_export_to_s3(
-                'SELECT * FROM v_internal_generate_allocation_simple_area_table', 
+                'SELECT * FROM allocation.v_internal_generate_allocation_simple_area_table', 
                 aws_commons.create_s3_uri(
                     '{BUCKET_NAME}',
                     '{PARQUET_PREFIX}/v_internal_generate_allocation_simple_area_table.csv',
@@ -29,10 +26,6 @@ def export_views():
                 options :='FORMAT CSV'
             );        
         ''')
-        try:
-            print(cur.fetchone())  # TODO just need for debug?
-        except psycopg2.ProgrammingError:
-            print('No result from query_export_to_s3')
 
 
 def get_or_create_snapshot():
@@ -74,4 +67,19 @@ def get_or_create_export(snapshot_arn, role_arn, kms_key_id):
         )
         exit(0)
 
-# TODO will also need to export a CSV of allocation.v_internal_generate_allocation_simple_area_table
+
+def attach_rds_to_s3_role_to_db(role):
+    rds = boto3.client('rds', region_name=REGION_NAME)
+    try:
+        rds.add_role_to_db_instance(
+            DBInstanceIdentifier=DATABASE_ID,
+            RoleArn=role.name,
+            FeatureName='s3Export'
+        )
+    except botocore.exceptions.ClientError as err:
+        msg = 'The engine PostgreSQL supports only one ARN associated with feature name s3Export.'
+        if err.response['Error']['Message'] == msg:  # TODO find a more reliable way to check for this
+            pass  # ignore if its already added
+        else:
+            print(err)
+            exit(1)
