@@ -53,6 +53,16 @@ WITH SERDEPROPERTIES ('serialization.format' = '1')
 LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/recon.data_raw_layer3'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
+-- recon.ices_area
+CREATE EXTERNAL TABLE IF NOT EXISTS sedna.ices_area (
+    ices_area_id INT,
+    ices_area STRING
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+WITH SERDEPROPERTIES ('serialization.format' = '1')
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/recon.ices_area'
+TBLPROPERTIES ('has_encrypted_data'='false');
+
 -- recon.nafo
 CREATE EXTERNAL TABLE IF NOT EXISTS sedna.nafo (
     nafo_division_id INT,
