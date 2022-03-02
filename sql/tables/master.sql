@@ -52,7 +52,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS sedna.eez (
     hdi_link STRING,
     iso_3 STRING,
     iso_2 STRING,
-    hdi DOUBLE,
+    hdi STRING,
     hdi_source STRING,
     hdi_publication_year INT
 )
