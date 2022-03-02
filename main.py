@@ -36,6 +36,11 @@ def view_export():
     pass
 
 
+def setup_athena():
+    athena.create_database()
+    athena.create_tables()
+
+
 def test_tables():
     # athena.test_tables()
     pass
@@ -57,6 +62,7 @@ def main():
     permissions()
     snapshot_export()
     view_export()
+    setup_athena()
     test_tables()
     aggregation()
     allocation()
