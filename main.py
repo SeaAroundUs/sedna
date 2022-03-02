@@ -37,9 +37,10 @@ def view_export():
 
 
 def setup_athena():
-    athena.create_database()
-    athena.create_core_tables()
-    athena.create_data_table()
+    # athena.create_database()
+    # athena.create_core_tables()
+    # athena.create_data_table()
+    pass
 
 
 def test_tables():

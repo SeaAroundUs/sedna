@@ -27,8 +27,7 @@ def create_database():
 
 # ddl for parquet tables: https://docs.aws.amazon.com/athena/latest/ug/parquet-serde.html
 def create_core_tables():
-    print('Creating core tables in Athena...')
-    print('---')
+    print('Creating core tables in Athena...\n---')
     for schema in ['allocation', 'distribution', 'geo', 'master', 'recon', 'views']:
         print(f'-- {schema} --')
         queries = read_sql_file(f'tables/{schema}.sql').split(';')[:-1]
@@ -42,13 +41,30 @@ def create_core_tables():
 # ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
 def create_data_table():
     print('Creating data table in Athena...')
-    sql = read_sql_file(f'create_dataraw_table.sql')
+    sql = read_sql_file('create_dataraw_table.sql')
     run_query(sql)
 
 
 def test_tables():
-    print('Testing tables...')
+    print('Testing tables...\n---')
     sql = 'SHOW TABLES IN sedna;'
     qid = run_query(sql)
-    tables = get_query_results(qid)
-    print(tables)
+    result = get_query_results(qid)
+    tables = [row['Data'][0]['VarCharValue'] for row in result['ResultSet']['Rows']]
+    bad_tables = []
+    for table in tables:
+        print(f'Testing {table}...', end='')
+        sql = f'SELECT * FROM sedna.{table} LIMIT 1;'
+        qid = run_query(sql)
+        try:
+            result = get_query_results(qid)
+            if len(result['ResultSet']['Rows']) == 2:  # column names count as a row
+                print('OK!')
+            else:
+                print('ERROR: EMPTY TABLE!')
+                bad_tables += [table]
+        except Exception as err:  # TODO harden this, its not 100% reliable yet
+            print(f'ERROR: QUERY FAILED! {err}')
+            bad_tables += [table]
+    if len(bad_tables) > 0:
+        print('The following tables failed:', bad_tables)
