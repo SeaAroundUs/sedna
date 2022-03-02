@@ -1,4 +1,5 @@
 import boto3
+import time
 from sedna.common import read_sql_file, REGION_NAME, RESULT_CONFIGURATION
 
 
@@ -10,6 +11,12 @@ def run_query(sql):
 
 def get_query_results(qid):
     athena = boto3.client('athena', region_name=REGION_NAME)
+    while True:
+        query_exec = athena.get_query_execution(QueryExecutionId=qid)
+        state = query_exec['QueryExecution']['Status']['State']
+        if state not in ['QUEUED', 'RUNNING']:  # TODO handle error states
+            break
+        time.sleep(1)
     return athena.get_query_results(QueryExecutionId=qid)
 
 
@@ -40,4 +47,8 @@ def create_data_table():
 
 
 def test_tables():
-    pass
+    print('Testing tables...')
+    sql = 'SHOW TABLES IN sedna;'
+    qid = run_query(sql)
+    tables = get_query_results(qid)
+    print(tables)
