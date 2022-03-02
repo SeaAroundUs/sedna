@@ -68,3 +68,9 @@ def test_tables():
             bad_tables += [table]
     if len(bad_tables) > 0:
         print('The following tables failed:', bad_tables)
+
+
+def preprocess_raw_data():
+    # substitute taxon key if there is no distribution
+    # TODO
+    pass

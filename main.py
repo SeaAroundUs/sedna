@@ -46,6 +46,10 @@ def test_tables():
     athena.test_tables()
 
 
+def preprocess():
+    athena.preprocess_raw_data()
+
+
 def aggregation():
     # TODO
     pass
@@ -64,6 +68,7 @@ def main():
     view_export()
     setup_athena()
     test_tables()
+    preprocess()
     aggregation()
     allocation()
 
