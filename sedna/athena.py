@@ -19,8 +19,9 @@ def create_database():
 
 
 # ddl for parquet tables: https://docs.aws.amazon.com/athena/latest/ug/parquet-serde.html
-def create_tables():
-    print('Creating tables in Athena...')
+def create_core_tables():
+    print('Creating core tables in Athena...')
+    print('---')
     for schema in ['allocation', 'distribution', 'geo', 'master', 'recon', 'views']:
         print(f'-- {schema} --')
         queries = read_sql_file(f'tables/{schema}.sql').split(';')[:-1]
@@ -28,6 +29,14 @@ def create_tables():
             table_name = sql.strip().split('\n')[0].replace('-- ', '')
             print(f'Creating {table_name}...')
             run_query(sql)
+    print('---')
+
+
+# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+def create_data_table():
+    print('Creating data table in Athena...')
+    sql = read_sql_file(f'create_dataraw_table.sql')
+    run_query(sql)
 
 
 def test_tables():
