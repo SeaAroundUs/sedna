@@ -11,12 +11,12 @@ AS SELECT
 	c.eez_id,
 	c.fao_area_id,
 	c.year,
-	c.taxon_key,
+	COALESCE(tds.use_this_taxon_key_instead, c.taxon_key) AS taxon_key,
 	c.amount,
-	st.name as sector,
+	st.name AS sector,
 	c.catch_type_id,
 	c.reporting_status_id,
-	it.name as input,
+	it.name AS input,
 	c.gear_type_id,
 	ia.ices_area,
 	c.ccamlr_area,
@@ -26,4 +26,5 @@ JOIN sedna.time y ON (y.year = c.year AND y.is_used_for_allocation)
 JOIN sedna.sector_type st ON (st.sector_type_id = c.sector_type_id)
 JOIN sedna.input_type it ON (it.input_type_id = c.input_type_id)
 LEFT JOIN sedna.ices_area ia ON (ia.ices_area_id = c.ices_area_id)
-LEFT JOIN sedna.nafo na ON (na.nafo_division_id = c.nafo_division_id);
+LEFT JOIN sedna.nafo na ON (na.nafo_division_id = c.nafo_division_id)
+LEFT JOIN sedna.taxon_distribution_substitute tds ON (c.taxon_key = tds.original_taxon_key);
