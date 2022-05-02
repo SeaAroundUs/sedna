@@ -5,6 +5,7 @@ WITH (
   parquet_compression = 'SNAPPY'
 )
 AS SELECT
+    row_number() OVER () AS universal_data_id,
     c.raw_catch_id,
 	c.layer,
 	c.fishing_entity_id,
