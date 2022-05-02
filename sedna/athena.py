@@ -39,6 +39,8 @@ def create_core_tables():
 
 
 # ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+# !!! NOTE !!! if this table needs to be recreated for a run then underlying
+#              ctas.dataraw folder must be deleted in S3 as well
 def create_data_table():
     print('Creating data table in Athena...')
     sql = read_sql_file('create_dataraw_table.sql')
