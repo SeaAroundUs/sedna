@@ -133,6 +133,17 @@ WITH SERDEPROPERTIES ('serialization.format' = '1')
 LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/master.geo_entity'
 TBLPROPERTIES ('has_encrypted_data'='false');
 
+-- master.high_seas
+CREATE EXTERNAL TABLE IF NOT EXISTS sedna.high_seas (
+    fao_area_id INT,
+    name STRING,
+    alternate_name STRING
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+WITH SERDEPROPERTIES ('serialization.format' = '1')
+LOCATION 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/master.high_seas'
+TBLPROPERTIES ('has_encrypted_data'='false');
+
 -- master.input_type
 CREATE EXTERNAL TABLE IF NOT EXISTS sedna.input_type (
     input_type_id INT,
