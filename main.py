@@ -6,10 +6,11 @@ import sedna.rds as rds
 
 
 def check_prereqs():
-    # TODO check for version
-    # TODO check for env
-    # TODO check for basic AWS access
-    # TODO check for existence of S3
+    # TODO check for env settings in file
+    # TODO check for export version file
+    # TODO check for basic AWS access via boto
+    # TODO check for existence of S3 bucket
+    # TODO check for RDS access
     pass
 
 
@@ -40,6 +41,7 @@ def setup_athena():
     athena.create_database()
     athena.create_core_tables()
     athena.create_data_table()
+    athena.create_area_table()
 
 
 def test_tables():
@@ -47,13 +49,11 @@ def test_tables():
 
 
 def aggregation():
-    # TODO
-    pass
+    pass  # TODO
 
 
 def allocation():
-    # TODO
-    pass
+    pass  # TODO
 
 
 def main():

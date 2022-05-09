@@ -47,6 +47,15 @@ def create_data_table():
     run_query(sql)
 
 
+# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+# !!! NOTE !!! if this table needs to be recreated for a run then underlying
+#              ctas.area folder must be deleted in S3 as well
+def create_area_table():
+    print('Creating area table in Athena...')
+    sql = read_sql_file('create_area_table.sql')
+    run_query(sql)
+
+
 def test_tables():
     print('Testing tables...\n---')
     sql = 'SHOW TABLES IN sedna;'

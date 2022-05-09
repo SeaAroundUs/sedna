@@ -1,3 +1,5 @@
+-- dataraw table creation
+-- from https://github.com/SeaAroundUs/Merlin-database-mssql/blob/4b223108bad7e6863e7feae853053778026568c8/sprocs.sql#L1515
 CREATE TABLE IF NOT EXISTS sedna.dataraw
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.dataraw',
