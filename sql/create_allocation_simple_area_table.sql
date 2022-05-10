@@ -1,8 +1,8 @@
 -- area table creation
 -- from https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/MerlinGen.sql#L375
-CREATE TABLE IF NOT EXISTS sedna.area
+CREATE TABLE IF NOT EXISTS sedna.allocation_simple_area
 WITH (
-  external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.area',
+  external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.allocation_simple_area',
   format = 'PARQUET',
   parquet_compression = 'SNAPPY'
 )

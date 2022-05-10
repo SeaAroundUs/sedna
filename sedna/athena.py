@@ -42,17 +42,17 @@ def create_core_tables():
 # !!! NOTE !!! if this table needs to be recreated for a run then underlying
 #              ctas.dataraw folder must be deleted in S3 as well
 def create_data_table():
-    print('Creating data table in Athena...')
+    print('Creating dataraw table in Athena...')
     sql = read_sql_file('create_dataraw_table.sql')
     run_query(sql)
 
 
 # ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
 # !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.area folder must be deleted in S3 as well
-def create_area_table():
-    print('Creating area table in Athena...')
-    sql = read_sql_file('create_area_table.sql')
+#              ctas.allocation_simple_area folder must be deleted in S3 as well
+def create_allocation_simple_area_table():
+    print('Creating allocation simple area table in Athena...')
+    sql = read_sql_file('create_allocation_simple_area_table.sql')
     run_query(sql)
 
 
