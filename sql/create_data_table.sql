@@ -81,5 +81,5 @@ SELECT universal_data_id,
        taxon_key,
        year
 FROM dataraw dr
-JOIN input_type it ON (dr.input = input_type.name)
-JOIN sector_type st ON (dr.sector = sector_type.name);
+JOIN input_type it ON (dr.input = it.name)
+JOIN sector_type st ON (dr.sector = st.name);
