@@ -27,7 +27,7 @@ AS SELECT
 	c.ccamlr_area,
 	na.nafo_division,
     CASE
-        WHEN c.eez_id = 999 THEN 'Layer3'
+        WHEN c.eez_id = 999 THEN 'Layer3' -- OR (dr.BigCellID != null && dr.BigCellID > 0) --TODO where is this field coming from?
         WHEN c.fao_area_id = 21 AND na.nafo_division IS NOT NULL THEN 'NAFO'
         WHEN c.fao_area_id IN (48, 58, 88) AND c.ccamlr_area IS NOT NULL THEN 'CCAMLR'
         WHEN c.fao_area_id = 27 THEN 'ICES'
