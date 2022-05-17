@@ -40,8 +40,9 @@ def view_export():
 def setup_athena():
     athena.create_database()
     athena.create_core_tables()
-    athena.create_data_table()
+    athena.create_dataraw_table()
     athena.create_allocation_simple_area_table()
+    athena.create_data_table()
 
 
 def test_tables():

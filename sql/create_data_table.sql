@@ -1,7 +1,13 @@
 -- data table creation
 -- from https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/IntegrateDataRaw/ImportDataRaw.cs#L71
 -- (had to move some of the area_id logic to the dataraw table due to nested sub-queries)
-SELECT universal_data_id,
+CREATE TABLE IF NOT EXISTS sedna.data
+WITH (
+  external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.data',
+  format = 'PARQUET',
+  parquet_compression = 'SNAPPY'
+)
+AS SELECT universal_data_id,
        IF(eez_id = 999, 2, 1) AS allocation_area_type_id,
        dr.area_type,
        CASE

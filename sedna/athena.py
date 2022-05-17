@@ -33,7 +33,7 @@ def create_core_tables():
         queries = read_sql_file(f'tables/{schema}.sql').split(';')[:-1]
         for sql in queries:
             table_name = sql.strip().split('\n')[0].replace('-- ', '')
-            print(f'Creating {table_name}...')
+            print(f'Creating {table_name} from snapshot...')
             run_query(sql)
     print('---')
 
@@ -41,8 +41,8 @@ def create_core_tables():
 # ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
 # !!! NOTE !!! if this table needs to be recreated for a run then underlying
 #              ctas.dataraw folder must be deleted in S3 as well
-def create_data_table():
-    print('Creating dataraw table in Athena...')
+def create_dataraw_table():
+    print('Creating dataraw table from query...')
     sql = read_sql_file('create_dataraw_table.sql')
     run_query(sql)
 
@@ -51,8 +51,18 @@ def create_data_table():
 # !!! NOTE !!! if this table needs to be recreated for a run then underlying
 #              ctas.allocation_simple_area folder must be deleted in S3 as well
 def create_allocation_simple_area_table():
-    print('Creating allocation simple area table in Athena...')
+    print('Creating allocation simple area table from query...')
     sql = read_sql_file('create_allocation_simple_area_table.sql')
+    run_query(sql)
+
+
+# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+# !!! NOTE !!! if this table needs to be recreated for a run then underlying
+#              ctas.data folder must be deleted in S3 as well
+def create_data_table():
+    # TODO this requires the dataraw and allocation_simple_area tables exist; check for that
+    print('Creating data table from query...')
+    sql = read_sql_file('create_data_table.sql')
     run_query(sql)
 
 
