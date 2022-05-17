@@ -3,46 +3,40 @@
 -- (had to move some of the area_id logic to the dataraw table due to nested sub-queries)
 SELECT universal_data_id,
        IF(eez_id = 999, 2, 1) AS allocation_area_type_id,
+       dr.area_type,
        CASE
-           -- Layer 3
-           WHEN eez_id = 999 -- OR (dr.BigCellID != null && dr.BigCellID > 0) --TODO where is this field coming from?
+           WHEN dr.area_type = 'Layer3'
            THEN NULL --TODO https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/Area/AssignGenericAreaIDToData.cs#L129
-           -- NAFO
-           WHEN fao_area_id = 21 AND nafo_division IS NOT NULL
+           WHEN dr.area_type = 'NAFO'
            THEN (SELECT allocation_simple_area_id
                  FROM sedna.allocation_simple_area asa
-                 WHERE asa.marine_layer_id = 18
+                 WHERE asa.marine_layer_id = 18 -- TODO this doesn't seem to exist in the allocation_simple_area table
                    AND asa.area_id = dr.area_id
                    AND asa.fao_area_id = dr.fao_area_id)
-           -- CCAMLR
-           WHEN fao_area_id IN (48, 58, 88) AND ccamlr_area IS NOT NULL
+           WHEN dr.area_type = 'CCAMLR'
            THEN (SELECT allocation_simple_area_id
                  FROM sedna.allocation_simple_area asa
                  WHERE asa.marine_layer_id = 17
                    AND asa.area_id = dr.area_id
                    AND asa.fao_area_id = dr.fao_area_id)
-           -- ICES
-           WHEN fao_area_id = 27
+           WHEN dr.area_type = 'ICES'
            THEN (SELECT allocation_simple_area_id
                  FROM sedna.allocation_simple_area asa
                  WHERE asa.marine_layer_id = 15
                    AND asa.area_id = dr.area_id
                    AND asa.fao_area_id = dr.fao_area_id)
-           -- High Seas
-           WHEN eez_id = 0 AND fao_area_id > 0
+           WHEN dr.area_type = 'High Seas'
            THEN (SELECT allocation_simple_area_id
                  FROM sedna.allocation_simple_area asa
                  WHERE asa.marine_layer_id = 2
                    AND asa.area_id = dr.area_id
                    AND asa.fao_area_id = dr.fao_area_id)
-           -- IFA
            WHEN dr.area_type = 'IFA'
            THEN (SELECT allocation_simple_area_id
                  FROM sedna.allocation_simple_area asa
                  WHERE asa.marine_layer_id = 14
                    AND asa.area_id = dr.area_id
                    AND asa.fao_area_id = dr.fao_area_id)
-           -- EEZ
            WHEN dr.area_type = 'EEZ'
            THEN (SELECT allocation_simple_area_id
                  FROM sedna.allocation_simple_area asa
@@ -52,7 +46,9 @@ SELECT universal_data_id,
            ELSE NULL -- this shouldn't happen; check for these
        END AS generic_allocation_area_id,
        fishing_entity_id AS original_fishing_entity_id,
-       fishing_entity_id AS fishing_entity_id, --TODO 213 if it needs to be reassigned to unknown
+       -- per https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/Resolve999/step2/CreateAllocationHybridArea.cs#L17
+       -- fishing_entity_id is assigned to 213 only for layer 3 when there are no access agreements or un-declared EEzs or high seas
+       fishing_entity_id AS fishing_entity_id,
        amount AS catch_amount,
        catch_type_id,
        reporting_status_id,
