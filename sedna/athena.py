@@ -20,9 +20,25 @@ def get_query_results(qid):
     return athena.get_query_results(QueryExecutionId=qid)
 
 
+def wait_for_table(table, tries=24, timeout=5):
+    print(f'Waiting for creation of {table}...', end='')
+    sql = f"SHOW TABLES IN sedna '{table}';"
+    attempt = 0
+    while attempt < tries:
+        time.sleep(timeout)
+        qid = run_query(sql)
+        result = get_query_results(qid)
+        if len(result['ResultSet']['Rows']) > 0:
+            return
+        print('.', end='')
+        attempt += 1
+    # TODO handle running out of tries
+
+
 def create_database():
     print('Creating database in Athena...')
-    return run_query(read_sql_file('create_database.sql'))
+    sql = read_sql_file('create_database.sql')
+    run_query(sql)
 
 
 # ddl for parquet tables: https://docs.aws.amazon.com/athena/latest/ug/parquet-serde.html
@@ -60,9 +76,30 @@ def create_allocation_simple_area_table():
 # !!! NOTE !!! if this table needs to be recreated for a run then underlying
 #              ctas.data folder must be deleted in S3 as well
 def create_data_table():
-    # TODO this requires the dataraw and allocation_simple_area tables exist; check for that
+    wait_for_table('allocation_simple_area')
+    wait_for_table('dataraw')
     print('Creating data table from query...')
     sql = read_sql_file('create_data_table.sql')
+    run_query(sql)
+
+
+# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+# !!! NOTE !!! if this table needs to be recreated for a run then underlying
+#              ctas.allocation_unique_area folder must be deleted in S3 as well
+def create_allocation_unique_area_table():
+    wait_for_table('data')
+    print('Creating allocation unique area table from query...')
+    sql = read_sql_file('create_allocation_unique_area_table.sql')
+    run_query(sql)
+
+
+# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+# !!! NOTE !!! if this table needs to be recreated for a run then underlying
+#              ctas.allocation_unique_area folder must be deleted in S3 as well
+def create_allocation_unique_area_cell_table():
+    wait_for_table('allocation_unique_area')
+    print('Creating allocation unique area cell table from query...')
+    sql = read_sql_file('create_allocation_unique_area_cell_table.sql')
     run_query(sql)
 
 
