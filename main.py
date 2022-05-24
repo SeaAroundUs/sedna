@@ -47,6 +47,7 @@ def setup_athena():
 def data_preprocess():
     athena.create_data_table()
     athena.create_allocation_unique_area_table()
+    athena.create_simple_area_cell_assignment_table()
     # athena.create_allocation_unique_area_cell_table() # TODO reimplement function logic
 
 
@@ -64,8 +65,8 @@ def main():
     permissions()
     snapshot_export()
     view_export()
-    setup_athena()
-    test_tables()
+    # setup_athena()
+    # test_tables()
     data_preprocess()
     allocation()
 

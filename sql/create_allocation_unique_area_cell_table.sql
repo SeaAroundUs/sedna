@@ -7,8 +7,10 @@ WITH (
   format = 'PARQUET',
   parquet_compression = 'SNAPPY'
 )
-SELECT unique_area_id,
+AS SELECT unique_area_id,
        allocation_simple_area_id,
        NULL AS cell_id, --TODO
        0.0 AS water_area --TODO
 FROM sedna.allocation_unique_area;
+
+--TODO needs SimpleAreaCellAssignment first

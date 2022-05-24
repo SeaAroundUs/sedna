@@ -21,18 +21,20 @@ def get_query_results(qid):
 
 
 def wait_for_table(table, tries=24, timeout=5):
-    print(f'Waiting for creation of {table}...', end='')
+    print(f'Waiting for creation of {table} table to finish...', end='')
     sql = f"SHOW TABLES IN sedna '{table}';"
     attempt = 0
     while attempt < tries:
-        time.sleep(timeout)
         qid = run_query(sql)
         result = get_query_results(qid)
         if len(result['ResultSet']['Rows']) > 0:
+            print('done!')
             return
         print('.', end='')
+        time.sleep(timeout)
         attempt += 1
-    # TODO handle running out of tries
+    raise Exception(f'Ran out of tries waiting for {table} ({tries} tries of {timeout}s);' +
+                    'try increasing number of tries or timeout')
 
 
 def create_database():
@@ -100,6 +102,16 @@ def create_allocation_unique_area_cell_table():
     wait_for_table('allocation_unique_area')
     print('Creating allocation unique area cell table from query...')
     sql = read_sql_file('create_allocation_unique_area_cell_table.sql')
+    run_query(sql)
+
+
+# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+# !!! NOTE !!! if this table needs to be recreated for a run then underlying
+#              ctas.simple_area_cell_assignment folder must be deleted in S3 as well
+def create_simple_area_cell_assignment_table():
+    wait_for_table('allocation_simple_area')
+    print('Creating simple_area_cell_assignment table from query...')
+    sql = read_sql_file('create_simple_area_cell_assignment_table.sql')
     run_query(sql)
 
 
