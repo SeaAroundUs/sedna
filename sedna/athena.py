@@ -100,6 +100,9 @@ def create_allocation_unique_area_table():
 #              ctas.allocation_unique_area folder must be deleted in S3 as well
 def create_allocation_unique_area_cell_table():
     wait_for_table('allocation_unique_area')
+    wait_for_table('simple_area_cell_assignment')
+    wait_for_table('hybrid_to_simple_area_mapper')
+    wait_for_table('cells_for_area_type_3')
     print('Creating allocation unique area cell table from query...')
     sql = read_sql_file('create_allocation_unique_area_cell_table.sql')
     run_query(sql)
