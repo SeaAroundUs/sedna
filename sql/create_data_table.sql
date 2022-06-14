@@ -1,6 +1,9 @@
 -- data table creation
 -- from https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/IntegrateDataRaw/ImportDataRaw.cs#L71
 -- (had to move some of the area_id logic to the dataraw table due to nested sub-queries)
+
+-- TODO UPDATE FOR NEW LAYER3 STUFF IN dataraw
+
 CREATE TABLE IF NOT EXISTS sedna.data
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.data',
@@ -16,7 +19,7 @@ AS SELECT
            IF(eez_id = 999, 2, 1) AS allocation_area_type_id,
            dr.area_type,
            CASE
-               WHEN dr.area_type = 'Layer3'
+               WHEN dr.area_type = 'Hybrid'
                THEN NULL --TODO https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/Area/AssignGenericAreaIDToData.cs#L129
                WHEN dr.area_type = 'NAFO'
                THEN (SELECT allocation_simple_area_id

@@ -8,26 +8,11 @@ WITH (
   parquet_compression = 'SNAPPY'
 )
 AS SELECT aua.unique_area_id,
-       seca.allocation_simple_area_id,
-       CASE
-           WHEN aua.allocation_area_type_id = 1
-           THEN seca.cell_id --TODO
-           WHEN aua.allocation_area_type_id = 2
-           THEN NULL --TODO need AutoGen_HybridToSimpleAreaMapper
-           WHEN aua.allocation_area_type_id = 3
-           THEN NULL --TODO need GetCellsForAreaType3
-           ELSE NULL -- this should never happen
-       END AS cell_id,
-       CASE
-           WHEN aua.allocation_area_type_id = 1
-           THEN seca.water_area --TODO
-           WHEN aua.allocation_area_type_id = 2
-           THEN NULL --TODO need AutoGen_HybridToSimpleAreaMapper
-           WHEN aua.allocation_area_type_id = 3
-           THEN NULL --TODO need GetCellsForAreaType3
-           ELSE NULL -- this should never happen
-       END AS water_area
-FROM sedna.allocation_unique_area aua
-JOIN sedna.simple_area_cell_assignment seca ON (aua.generic_allocation_area_id = seca.allocation_simple_area_id);
+          seca.allocation_simple_area_id,
+          seca.cell_id,
+          seca.water_area
+   FROM sedna.allocation_unique_area aua
+   JOIN sedna.simple_area_cell_assignment seca ON (aua.generic_allocation_area_id = seca.allocation_simple_area_id)
+   WHERE aua.allocation_area_type_id = 1;
 
---TODO this might work better as splitting on the allocation_area_type_id, doing 3 separate joins, then doing a UNION
+--TODO allocation_area_type_id = 2 and 3 in UNIONS, type 2 uses AutoGen_HybridToSimpleAreaMapper and type 3 uses GetCellsForAreaType3
