@@ -2,7 +2,7 @@
 -- from https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/IntegrateDataRaw/ImportDataRaw.cs#L71
 -- (had to move some of the area_id logic to the dataraw table due to nested sub-queries)
 
--- TODO UPDATE FOR NEW LAYER3 STUFF IN dataraw
+-- TODO UPDATE FOR NEW HYBRID STUFF IN dataraw
 
 CREATE TABLE IF NOT EXISTS sedna.data
 WITH (
@@ -62,7 +62,7 @@ AS SELECT
            fishing_entity_id AS original_fishing_entity_id,
            -- per https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/Resolve999/step2/CreateAllocationHybridArea.cs#L17
            -- fishing_entity_id is assigned to 213 only for layer 3 when there are no access agreements or un-declared EEzs or high seas
-           fishing_entity_id AS fishing_entity_id,
+           fishing_entity_id AS fishing_entity_id, --TODO see above
            amount AS catch_amount,
            catch_type_id,
            reporting_status_id,
