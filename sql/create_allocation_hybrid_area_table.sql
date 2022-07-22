@@ -36,7 +36,7 @@ AS WITH access_agreement_eezs AS (
     )
     WHERE dr.area_type = 'Hybrid'
     GROUP BY dr.universal_data_id
-), hybrid_data AS (
+), hybrid_data AS ( -- TODO check for dupes here? should use combo of fishing_entity,year,fao,year,layer?
     SELECT dr.layer, -- TODO is this column needed?
         dr.fishing_entity_id,
         dr.fao_area_id,
@@ -116,12 +116,12 @@ FROM (
       AND hd.fao_area_id = 21
     GROUP BY 1,2,4,5,6,7,8
     UNION ALL
-    -- TODO other https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea.cs
+    -- other https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea.cs
     SELECT hd.fao_area_id AS fao_area_id,
-           0 AS marine_layer_id_1,
-           NULL AS area_ids_1,
-           0 AS marine_layer_id_2,
-           NULL AS area_ids_2,
+           12 AS marine_layer_id_1,
+           array_sort(array_union(access_agreement_eezs, undeclared_eezs)) AS area_ids_1,
+           if(hd.fao_area_id != 37,2,0) AS marine_layer_id_2,
+           if(hd.fao_area_id != 37,ARRAY[hd.fao_area_id],ARRAY[]) AS area_ids_2,
            FALSE AS reassign_to_unknown_fishing_entity,
            hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
            hd.undeclared_eezs AS internal_audit_undeclared_eezs
