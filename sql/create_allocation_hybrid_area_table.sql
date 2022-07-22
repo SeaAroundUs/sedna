@@ -37,7 +37,7 @@ AS WITH access_agreement_eezs AS (
     WHERE dr.area_type = 'Hybrid'
     GROUP BY dr.universal_data_id
 ), hybrid_data AS (
-    SELECT dr.layer,
+    SELECT dr.layer, -- TODO is this column needed?
         dr.fishing_entity_id,
         dr.fao_area_id,
         dr.year,
@@ -55,6 +55,7 @@ AS WITH access_agreement_eezs AS (
 -- note that includeHighSeas is always true according to this call:
 -- https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/Process/ProcessAllocationHybridArea.cs#L40
 -- TODO check for dupes? do we only need one of each combination? omit empty rows or no?
+-- TODO do we need some way to link these back to dataraw rows? include fishing entity, year, and spatial area data?
 SELECT row_number() OVER () AS allocation_hybrid_area_id, *
 FROM (
     -- ICES https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_ICES.cs
@@ -70,8 +71,7 @@ FROM (
     JOIN eez_ices_combo eic ON (eic.ices_area_id = hd.ices_area AND eic.is_ifa = FALSE)
     WHERE hd.ices_area IS NOT NULL
       AND hd.fao_area_id = 27
-    GROUP BY 1,2,4,5,6,7
-    HAVING cardinality(array_intersect((access_agreement_eezs || undeclared_eezs), array_agg(eic.eez_id))) > 0
+    GROUP BY 1,2,4,5,6,7,8
     UNION ALL
     -- TODO BigCell https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_BigCell.cs
     SELECT hd.fao_area_id AS fao_area_id,
@@ -86,32 +86,38 @@ FROM (
     FROM hybrid_data hd
     WHERE hd.big_cell_id IS NOT NULL
     UNION ALL
-    -- TODO CCAMLR https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_CCAMLR.cs
-    SELECT 0 AS fao_area_id,
-           0 AS marine_layer_id_1,
-           NULL AS area_ids_1,
-           0 AS marine_layer_id_2,
-           NULL AS area_ids_2,
+    -- CCAMLR https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_CCAMLR.cs
+    SELECT hd.fao_area_id AS fao_area_id,
+           17 AS marine_layer_id_1,
+           array_sort(array_intersect((access_agreement_eezs || undeclared_eezs || ARRAY[0]), array_agg(ecc.eez_id))) AS area_ids_1,
+           2 AS marine_layer_id_2,
+           ARRAY[hd.fao_area_id] AS area_ids_2,
            FALSE AS reassign_to_unknown_fishing_entity,
            hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
            hd.undeclared_eezs AS internal_audit_undeclared_eezs
     FROM hybrid_data hd
+    JOIN eez_ccamlr_combo ecc ON (ecc.ccamlr_area_id = hd.ccamlr_area AND ecc.is_ifa = FALSE)
     WHERE hd.ccamlr_area IS NOT NULL
+      AND hd.fao_area_id IN (48,58,88)
+    GROUP BY 1,2,4,5,6,7,8
     UNION ALL
-    -- TODO NAFO https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_NAFO.cs
-    SELECT 0 AS fao_area_id,
-           0 AS marine_layer_id_1,
-           NULL AS area_ids_1,
-           0 AS marine_layer_id_2,
-           NULL AS area_ids_2,
+    -- NAFO https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_NAFO.cs
+    SELECT hd.fao_area_id AS fao_area_id,
+           18 AS marine_layer_id_1,
+           array_sort(array_intersect((access_agreement_eezs || undeclared_eezs || ARRAY[0]), array_agg(enc.eez_id))) AS area_ids_1,
+           2 AS marine_layer_id_2,
+           ARRAY[hd.fao_area_id] AS area_ids_2,
            FALSE AS reassign_to_unknown_fishing_entity,
            hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
            hd.undeclared_eezs AS internal_audit_undeclared_eezs
     FROM hybrid_data hd
+    JOIN eez_nafo_combo enc ON (enc.nafo_division = hd.nafo_division AND enc.is_ifa = FALSE)
     WHERE hd.nafo_division IS NOT NULL
+      AND hd.fao_area_id = 21
+    GROUP BY 1,2,4,5,6,7,8
     UNION ALL
     -- TODO other https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea.cs
-    SELECT 0 AS fao_area_id,
+    SELECT hd.fao_area_id AS fao_area_id,
            0 AS marine_layer_id_1,
            NULL AS area_ids_1,
            0 AS marine_layer_id_2,
