@@ -52,24 +52,76 @@ AS WITH access_agreement_eezs AS (
     LEFT JOIN undeclared_eezs ue ON (ue.universal_data_id = dr.universal_data_id)
     WHERE dr.area_type = 'Hybrid'
 )
+-- note that includeHighSeas is always true according to this call:
+-- https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/Process/ProcessAllocationHybridArea.cs#L40
+-- TODO check for dupes? do we only need one of each combination? omit empty rows or no?
 SELECT row_number() OVER () AS allocation_hybrid_area_id, *
 FROM (
-    -- TODO ICES https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_ICES.cs
+    -- ICES https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_ICES.cs
+    SELECT hd.fao_area_id AS fao_area_id,
+           15 AS marine_layer_id_1,
+           array_sort(array_intersect((access_agreement_eezs || undeclared_eezs || ARRAY[0]), array_agg(eic.eez_id))) AS area_ids_1,
+           2 AS marine_layer_id_2,
+           ARRAY[hd.fao_area_id] AS area_ids_2,
+           FALSE AS reassign_to_unknown_fishing_entity,
+           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
+           hd.undeclared_eezs AS internal_audit_undeclared_eezs
+    FROM hybrid_data hd
+    JOIN eez_ices_combo eic ON (eic.ices_area_id = hd.ices_area AND eic.is_ifa = FALSE)
+    WHERE hd.ices_area IS NOT NULL
+      AND hd.fao_area_id = 27
+    GROUP BY 1,2,4,5,6,7
+    HAVING cardinality(array_intersect((access_agreement_eezs || undeclared_eezs), array_agg(eic.eez_id))) > 0
+    UNION ALL
     -- TODO BigCell https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_BigCell.cs
+    SELECT hd.fao_area_id AS fao_area_id,
+           16 AS marine_layer_id_1,
+           NULL AS area_ids_1,
+           0 AS marine_layer_id_2,
+           NULL AS area_ids_2,
+           -- TODO if no access agreement EEZs assign to UnknownFishingEntity: https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_BigCell.cs#L21
+           FALSE AS reassign_to_unknown_fishing_entity,
+           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
+           hd.undeclared_eezs AS internal_audit_undeclared_eezs
+    FROM hybrid_data hd
+    WHERE hd.big_cell_id IS NOT NULL
+    UNION ALL
     -- TODO CCAMLR https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_CCAMLR.cs
+    SELECT 0 AS fao_area_id,
+           0 AS marine_layer_id_1,
+           NULL AS area_ids_1,
+           0 AS marine_layer_id_2,
+           NULL AS area_ids_2,
+           FALSE AS reassign_to_unknown_fishing_entity,
+           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
+           hd.undeclared_eezs AS internal_audit_undeclared_eezs
+    FROM hybrid_data hd
+    WHERE hd.ccamlr_area IS NOT NULL
+    UNION ALL
     -- TODO NAFO https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_NAFO.cs
+    SELECT 0 AS fao_area_id,
+           0 AS marine_layer_id_1,
+           NULL AS area_ids_1,
+           0 AS marine_layer_id_2,
+           NULL AS area_ids_2,
+           FALSE AS reassign_to_unknown_fishing_entity,
+           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
+           hd.undeclared_eezs AS internal_audit_undeclared_eezs
+    FROM hybrid_data hd
+    WHERE hd.nafo_division IS NOT NULL
+    UNION ALL
     -- TODO other https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea.cs
-)
-
--- looks like includeHighSeas is always true according to this call:
--- https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/Process/ProcessAllocationHybridArea.cs#L40
-
--- shape
--- 	[AllocationHybridAreaID] [int] IDENTITY(1,1) NOT NULL,
--- 	[FaoAreaID] [tinyint] NOT NULL,
--- 	[MarineLayerID1] [tinyint] NOT NULL,
--- 	[AreaIDs1] [nvarchar](255) NOT NULL,
--- 	[MarineLayerID2] [tinyint] NOT NULL,
--- 	[AreaIDs2] [nvarchar](255) NOT NULL,
--- 	[internalAudit_hasAgreementEEZs] [nvarchar](255) NOT NULL,
--- 	[internalAudit_unDeclaredEEZs] [nvarchar](255) NOT NULL,
+    SELECT 0 AS fao_area_id,
+           0 AS marine_layer_id_1,
+           NULL AS area_ids_1,
+           0 AS marine_layer_id_2,
+           NULL AS area_ids_2,
+           FALSE AS reassign_to_unknown_fishing_entity,
+           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
+           hd.undeclared_eezs AS internal_audit_undeclared_eezs
+    FROM hybrid_data hd
+    WHERE hd.ices_area IS NULL
+      AND hd.big_cell_id IS NULL
+      AND hd.ccamlr_area IS NULL
+      AND hd.nafo_division IS NULL
+);
