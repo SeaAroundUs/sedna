@@ -42,7 +42,7 @@ def setup_athena():
     athena.create_core_tables()
     athena.create_dataraw_table()
     athena.create_allocation_simple_area_table()
-    athena.create_allocation_hybrid_area_table()  # TODO implement
+    athena.create_allocation_hybrid_area_table()
 
 
 def data_preprocess():
@@ -66,7 +66,7 @@ def main():
     permissions()
     snapshot_export()
     view_export()
-    # setup_athena()
+    setup_athena()
     # test_tables()
     # data_preprocess()
     # allocation()

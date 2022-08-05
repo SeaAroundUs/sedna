@@ -78,6 +78,7 @@ def create_allocation_simple_area_table():
 # !!! NOTE !!! if this table needs to be recreated for a run then underlying
 #              ctas.allocation_hybrid_area folder must be deleted in S3 as well
 def create_allocation_hybrid_area_table():
+    wait_for_table('dataraw')
     print('Creating allocation hybrid area table from query...')
     sql = read_sql_file('create_allocation_hybrid_area_table.sql')
     run_query(sql)
@@ -87,6 +88,7 @@ def create_allocation_hybrid_area_table():
 # !!! NOTE !!! if this table needs to be recreated for a run then underlying
 #              ctas.data folder must be deleted in S3 as well
 def create_data_table():
+    wait_for_table('allocation_hybrid_area')
     wait_for_table('allocation_simple_area')
     wait_for_table('dataraw')
     print('Creating data table from query...')
