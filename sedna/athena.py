@@ -137,7 +137,7 @@ def test_tables():
     tables = [row['Data'][0]['VarCharValue'] for row in result['ResultSet']['Rows']]
     bad_tables = []
     for table in tables:
-        print(f'Testing {table}...', end='')
+        print(f'Testing {table}...', end='', flush=True)
         sql = f'SELECT * FROM sedna.{table} LIMIT 1;'
         qid = run_query(sql)
         try:
