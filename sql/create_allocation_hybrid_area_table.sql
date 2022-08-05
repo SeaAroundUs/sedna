@@ -37,10 +37,11 @@ AS WITH access_agreement_eezs AS (
     WHERE dr.area_type = 'Hybrid'
     GROUP BY dr.universal_data_id
 ), hybrid_data AS (
-    SELECT DISTINCT dr.layer,
+    SELECT DISTINCT dr.layer, -- dupe check here reduces table size by ~15x
         dr.fishing_entity_id,
         dr.fao_area_id,
         dr.year,
+        dr.taxon_key,
         dr.ices_area,
         dr.big_cell_id,
         dr.ccamlr_area,
@@ -68,6 +69,7 @@ AS WITH access_agreement_eezs AS (
                hd.layer,
                hd.fishing_entity_id,
                hd.year,
+               hd.taxon_key,
                hd.ices_area,
                hd.big_cell_id,
                hd.ccamlr_area,
@@ -76,7 +78,7 @@ AS WITH access_agreement_eezs AS (
         JOIN sedna.eez_ices_combo eic ON (eic.ices_area_id = hd.ices_area AND eic.is_ifa = FALSE)
         WHERE hd.ices_area IS NOT NULL
           AND hd.fao_area_id = 27
-        GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15
+        GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15,16
         UNION ALL
         -- BigCell https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_BigCell.cs
         SELECT hd.fao_area_id AS fao_area_id,
@@ -90,6 +92,7 @@ AS WITH access_agreement_eezs AS (
                hd.layer,
                hd.fishing_entity_id,
                hd.year,
+               hd.taxon_key,
                hd.ices_area,
                hd.big_cell_id,
                hd.ccamlr_area,
@@ -98,7 +101,7 @@ AS WITH access_agreement_eezs AS (
         JOIN sedna.eez_big_cell_combo ebc ON (ebc.big_cell_id = hd.big_cell_id AND ebc.is_ifa = FALSE)
         WHERE hd.big_cell_id IS NOT NULL
           AND cardinality(access_agreement_eezs || undeclared_eezs) > 0
-        GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15
+        GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15,16
         UNION ALL
         -- BigCell (unknown fishing entity) https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_BigCell.cs
         -- if no access agreement EEZs assign to UnknownFishingEntity:
@@ -114,6 +117,7 @@ AS WITH access_agreement_eezs AS (
                hd.layer,
                hd.fishing_entity_id,
                hd.year,
+               hd.taxon_key,
                hd.ices_area,
                hd.big_cell_id,
                hd.ccamlr_area,
@@ -122,7 +126,7 @@ AS WITH access_agreement_eezs AS (
         JOIN sedna.eez_big_cell_combo ebc ON (ebc.big_cell_id = hd.big_cell_id AND ebc.is_ifa = FALSE)
         WHERE hd.big_cell_id IS NOT NULL
           AND cardinality(access_agreement_eezs || undeclared_eezs) > 0
-        GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15
+        GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15,16
         UNION ALL
         -- CCAMLR https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_CCAMLR.cs
         SELECT hd.fao_area_id AS fao_area_id,
@@ -136,6 +140,7 @@ AS WITH access_agreement_eezs AS (
                hd.layer,
                hd.fishing_entity_id,
                hd.year,
+               hd.taxon_key,
                hd.ices_area,
                hd.big_cell_id,
                hd.ccamlr_area,
@@ -144,7 +149,7 @@ AS WITH access_agreement_eezs AS (
         JOIN sedna.eez_ccamlr_combo ecc ON (ecc.ccamlr_area_id = hd.ccamlr_area AND ecc.is_ifa = FALSE)
         WHERE hd.ccamlr_area IS NOT NULL
           AND hd.fao_area_id IN (48,58,88)
-        GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15
+        GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15,16
         UNION ALL
         -- NAFO https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea_NAFO.cs
         SELECT hd.fao_area_id AS fao_area_id,
@@ -158,6 +163,7 @@ AS WITH access_agreement_eezs AS (
                hd.layer,
                hd.fishing_entity_id,
                hd.year,
+               hd.taxon_key,
                hd.ices_area,
                hd.big_cell_id,
                hd.ccamlr_area,
@@ -166,7 +172,7 @@ AS WITH access_agreement_eezs AS (
         JOIN sedna.eez_nafo_combo enc ON (enc.nafo_division = hd.nafo_division AND enc.is_ifa = FALSE)
         WHERE hd.nafo_division IS NOT NULL
           AND hd.fao_area_id = 21
-        GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15
+        GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14,15,16
         UNION ALL
         -- other https://github.com/SeaAroundUs/MerlinCSharp/blob/master/Resolve999/step2/CreateAllocationHybridArea.cs
         SELECT hd.fao_area_id AS fao_area_id,
@@ -180,6 +186,7 @@ AS WITH access_agreement_eezs AS (
                hd.layer,
                hd.fishing_entity_id,
                hd.year,
+               hd.taxon_key,
                hd.ices_area,
                hd.big_cell_id,
                hd.ccamlr_area,
@@ -209,6 +216,7 @@ SELECT had.allocation_hybrid_area_id,
        had.layer,
        had.fishing_entity_id,
        had.year,
+       had.taxon_key,
        had.ices_area,
        had.big_cell_id,
        had.ccamlr_area,
