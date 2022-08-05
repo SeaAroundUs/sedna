@@ -21,7 +21,7 @@ def get_query_results(qid):
 
 
 def wait_for_table(table, tries=24, timeout=5):
-    print(f'Waiting for creation of {table} table to finish...', end='')
+    print(f'Waiting for creation of {table} table to finish...', end='', flush=True)
     sql = f"SHOW TABLES IN sedna '{table}';"
     attempt = 0
     while attempt < tries:
