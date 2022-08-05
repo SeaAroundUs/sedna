@@ -66,7 +66,7 @@ AS SELECT
            gear_type_id,
            it.input_type_id,
            st.sector_type_id,
-           taxon_key,
+           dr.taxon_key AS taxon_key,
            dr.year AS year
     FROM sedna.dataraw dr
     LEFT JOIN sedna.allocation_hybrid_area aha ON (
@@ -75,10 +75,11 @@ AS SELECT
         dr.fishing_entity_id = aha.fishing_entity_id AND
         dr.fao_area_id = aha.fao_area_id AND
         dr.year = aha.year AND
-        dr.ices_area = aha.ices_area AND
-        dr.big_cell_id = aha.big_cell_id AND
-        dr.ccamlr_area = aha.ccamlr_area AND
-        dr.nafo_division = aha.nafo_division
+        dr.taxon_key = aha.taxon_key AND
+	    (dr.ices_area = aha.ices_area OR (dr.ices_area IS NULL AND aha.ices_area IS NULL)) AND
+	    (dr.big_cell_id = aha.big_cell_id OR (dr.big_cell_id IS NULL AND aha.big_cell_id IS NULL)) AND
+	    (dr.ccamlr_area = aha.ccamlr_area OR (dr.ccamlr_area IS NULL AND aha.ccamlr_area IS NULL)) AND
+	    (dr.nafo_division = aha.nafo_division OR (dr.nafo_division IS NULL AND aha.nafo_division IS NULL))
     )
     JOIN sedna.input_type it ON (dr.input = it.name)
     JOIN sedna.sector_type st ON (dr.sector = st.name)
