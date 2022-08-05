@@ -6,7 +6,8 @@ WITH (
   format = 'PARQUET',
   parquet_compression = 'SNAPPY'
 )
-AS SELECT marine_layer_id,
+AS SELECT row_number() OVER () AS allocation_simple_area_id,
+          marine_layer_id,
           area_id,
           CAST(fao_area_id AS INT) AS fao_area_id,
           is_active AS active,
