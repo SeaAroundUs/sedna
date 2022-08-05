@@ -2,8 +2,6 @@
 -- from https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/IntegrateDataRaw/ImportDataRaw.cs#L71
 -- (had to move some of the area_id logic to the dataraw table due to nested sub-queries)
 
--- TODO UPDATE FOR NEW HYBRID STUFF IN dataraw
-
 CREATE TABLE IF NOT EXISTS sedna.data
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.data',
@@ -20,7 +18,7 @@ AS SELECT
            dr.area_type,
            CASE
                WHEN dr.area_type = 'Hybrid'
-               THEN NULL --TODO https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/Area/AssignGenericAreaIDToData.cs#L129
+               THEN aha.allocation_hybrid_area_id
                WHEN dr.area_type = 'NAFO'
                THEN (SELECT allocation_simple_area_id
                      FROM sedna.allocation_simple_area asa
@@ -60,9 +58,7 @@ AS SELECT
                ELSE NULL -- this shouldn't happen; check for these (currently all NAFO is null)
            END AS generic_allocation_area_id,
            fishing_entity_id AS original_fishing_entity_id,
-           -- per https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/Resolve999/step2/CreateAllocationHybridArea.cs#L17
-           -- fishing_entity_id is assigned to 213 only for layer 3 when there are no access agreements or un-declared EEzs or high seas
-           fishing_entity_id AS fishing_entity_id, --TODO see above
+           IF(aha.reassign_to_unknown_fishing_entity, 213, fishing_entity_id) AS fishing_entity_id,
            amount AS catch_amount,
            catch_type_id,
            reporting_status_id,
@@ -73,6 +69,17 @@ AS SELECT
            taxon_key,
            year
     FROM sedna.dataraw dr
+    LEFT JOIN sedna.allocation_hybrid_area aha ON (
+        dr.area_type = 'Hybrid' AND
+        dr.layer = aha.layer AND
+        dr.fishing_entity_id = aha.fishing_entity_id AND
+        dr.fao_area_id = aha.fao_area_id AND
+        dr.year = aha.year AND
+        dr.ices_area = aha.ices_area AND
+        dr.big_cell_id = aha.big_cell_id AND
+        dr.ccamlr_area = aha.ccamlr_area AND
+        dr.nafo_division = aha.nafo_division
+    )
     JOIN sedna.input_type it ON (dr.input = it.name)
     JOIN sedna.sector_type st ON (dr.sector = st.name)
 );

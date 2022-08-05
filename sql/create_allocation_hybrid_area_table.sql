@@ -205,4 +205,4 @@ SELECT had.fao_area_id,
        had.big_cell_id,
        had.ccamlr_area,
        had.nafo_division
-FROM hybrid_agg_data had
+FROM hybrid_agg_data had;
