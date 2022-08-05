@@ -57,17 +57,17 @@ AS SELECT
                        AND asa.fao_area_id = dr.fao_area_id)
                ELSE NULL -- this shouldn't happen; check for these (currently all NAFO is null)
            END AS generic_allocation_area_id,
-           fishing_entity_id AS original_fishing_entity_id,
-           IF(aha.reassign_to_unknown_fishing_entity, 213, fishing_entity_id) AS fishing_entity_id,
+           dr.fishing_entity_id AS original_fishing_entity_id,
+           IF(aha.reassign_to_unknown_fishing_entity, 213, dr.fishing_entity_id) AS fishing_entity_id,
            amount AS catch_amount,
            catch_type_id,
            reporting_status_id,
-           layer AS data_layer_id,
+           dr.layer AS data_layer_id,
            gear_type_id,
            it.input_type_id,
            st.sector_type_id,
            taxon_key,
-           year
+           dr.year AS year
     FROM sedna.dataraw dr
     LEFT JOIN sedna.allocation_hybrid_area aha ON (
         dr.area_type = 'Hybrid' AND
