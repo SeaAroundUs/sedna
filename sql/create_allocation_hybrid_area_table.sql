@@ -9,10 +9,10 @@ WITH (
 )
 AS WITH access_agreement_eezs AS (
     SELECT dr.universal_data_id, array_agg(DISTINCT aa.eez_id) as access_agreement_eezs
-    FROM dataraw dr
-    JOIN taxon tx ON (dr.taxon_key = tx.taxon_key)
-    JOIN eez_fao_combo efc ON (dr.fao_area_id = efc.fao_area_id)
-    JOIN access_agreement aa ON (
+    FROM sedna.dataraw dr
+    JOIN sedna.taxon tx ON (dr.taxon_key = tx.taxon_key)
+    JOIN sedna.eez_fao_combo efc ON (dr.fao_area_id = efc.fao_area_id)
+    JOIN sedna.access_agreement aa ON (
         aa.fishing_entity_id = dr.fishing_entity_id
         AND aa.eez_id = efc.reconstruction_eez_id
         AND aa.start_year <= dr.year
@@ -26,9 +26,9 @@ AS WITH access_agreement_eezs AS (
     GROUP BY dr.universal_data_id
 ), undeclared_eezs AS (
     SELECT dr.universal_data_id, array_agg(DISTINCT e.eez_id ORDER BY e.eez_id) as undeclared_eezs
-    FROM dataraw dr
-    JOIN eez_fao_combo efc ON (dr.fao_area_id = efc.fao_area_id)
-    JOIN eez e ON (
+    FROM sedna.dataraw dr
+    JOIN sedna.eez_fao_combo efc ON (dr.fao_area_id = efc.fao_area_id)
+    JOIN sedna.eez e ON (
         e.eez_id = efc.reconstruction_eez_id
         AND e.is_currently_used_for_reconstruction = TRUE
         AND e.declaration_year > dr.year
@@ -47,7 +47,7 @@ AS WITH access_agreement_eezs AS (
         dr.nafo_division,
         access_agreement_eezs,
         undeclared_eezs
-    FROM dataraw dr
+    FROM sedna.dataraw dr
     LEFT JOIN access_agreement_eezs aae ON (aae.universal_data_id = dr.universal_data_id)
     LEFT JOIN undeclared_eezs ue ON (ue.universal_data_id = dr.universal_data_id)
     WHERE dr.area_type = 'Hybrid'
@@ -63,8 +63,8 @@ FROM (
            2 AS marine_layer_id_2,
            ARRAY[hd.fao_area_id] AS area_ids_2,
            FALSE AS reassign_to_unknown_fishing_entity,
-           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
-           hd.undeclared_eezs AS internal_audit_undeclared_eezs,
+           IF(cardinality(hd.access_agreement_eezs) > 0, hd.access_agreement_eezs, NULL) AS internal_audit_has_agreement_eezs,
+           IF(cardinality(hd.undeclared_eezs) > 0, hd.undeclared_eezs, NULL) AS internal_audit_undeclared_eezs,
            hd.fishing_entity_id,
            hd.year,
            hd.ices_area,
@@ -72,7 +72,7 @@ FROM (
            hd.ccamlr_area,
            hd.nafo_division
     FROM hybrid_data hd
-    JOIN eez_ices_combo eic ON (eic.ices_area_id = hd.ices_area AND eic.is_ifa = FALSE)
+    JOIN sedna.eez_ices_combo eic ON (eic.ices_area_id = hd.ices_area AND eic.is_ifa = FALSE)
     WHERE hd.ices_area IS NOT NULL
       AND hd.fao_area_id = 27
     GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14
@@ -84,8 +84,8 @@ FROM (
            2 AS marine_layer_id_2,
            ARRAY[hd.fao_area_id] AS area_ids_2,
            FALSE AS reassign_to_unknown_fishing_entity,
-           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
-           hd.undeclared_eezs AS internal_audit_undeclared_eezs,
+           IF(cardinality(hd.access_agreement_eezs) > 0, hd.access_agreement_eezs, NULL) AS internal_audit_has_agreement_eezs,
+           IF(cardinality(hd.undeclared_eezs) > 0, hd.undeclared_eezs, NULL) AS internal_audit_undeclared_eezs,
            hd.fishing_entity_id,
            hd.year,
            hd.ices_area,
@@ -93,7 +93,7 @@ FROM (
            hd.ccamlr_area,
            hd.nafo_division
     FROM hybrid_data hd
-    JOIN eez_big_cell_combo ebc ON (ebc.big_cell_id = hd.big_cell_id AND ebc.is_ifa = FALSE)
+    JOIN sedna.eez_big_cell_combo ebc ON (ebc.big_cell_id = hd.big_cell_id AND ebc.is_ifa = FALSE)
     WHERE hd.big_cell_id IS NOT NULL
       AND cardinality(access_agreement_eezs || undeclared_eezs) > 0
     GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14
@@ -107,8 +107,8 @@ FROM (
            2 AS marine_layer_id_2,
            ARRAY[hd.fao_area_id] AS area_ids_2,
            TRUE AS reassign_to_unknown_fishing_entity,
-           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
-           hd.undeclared_eezs AS internal_audit_undeclared_eezs,
+           IF(cardinality(hd.access_agreement_eezs) > 0, hd.access_agreement_eezs, NULL) AS internal_audit_has_agreement_eezs,
+           IF(cardinality(hd.undeclared_eezs) > 0, hd.undeclared_eezs, NULL) AS internal_audit_undeclared_eezs,
            hd.fishing_entity_id,
            hd.year,
            hd.ices_area,
@@ -116,7 +116,7 @@ FROM (
            hd.ccamlr_area,
            hd.nafo_division
     FROM hybrid_data hd
-    JOIN eez_big_cell_combo ebc ON (ebc.big_cell_id = hd.big_cell_id AND ebc.is_ifa = FALSE)
+    JOIN sedna.eez_big_cell_combo ebc ON (ebc.big_cell_id = hd.big_cell_id AND ebc.is_ifa = FALSE)
     WHERE hd.big_cell_id IS NOT NULL
       AND cardinality(access_agreement_eezs || undeclared_eezs) > 0
     GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14
@@ -128,8 +128,8 @@ FROM (
            2 AS marine_layer_id_2,
            ARRAY[hd.fao_area_id] AS area_ids_2,
            FALSE AS reassign_to_unknown_fishing_entity,
-           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
-           hd.undeclared_eezs AS internal_audit_undeclared_eezs,
+           IF(cardinality(hd.access_agreement_eezs) > 0, hd.access_agreement_eezs, NULL) AS internal_audit_has_agreement_eezs,
+           IF(cardinality(hd.undeclared_eezs) > 0, hd.undeclared_eezs, NULL) AS internal_audit_undeclared_eezs,
            hd.fishing_entity_id,
            hd.year,
            hd.ices_area,
@@ -137,7 +137,7 @@ FROM (
            hd.ccamlr_area,
            hd.nafo_division
     FROM hybrid_data hd
-    JOIN eez_ccamlr_combo ecc ON (ecc.ccamlr_area_id = hd.ccamlr_area AND ecc.is_ifa = FALSE)
+    JOIN sedna.eez_ccamlr_combo ecc ON (ecc.ccamlr_area_id = hd.ccamlr_area AND ecc.is_ifa = FALSE)
     WHERE hd.ccamlr_area IS NOT NULL
       AND hd.fao_area_id IN (48,58,88)
     GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14
@@ -149,8 +149,8 @@ FROM (
            2 AS marine_layer_id_2,
            ARRAY[hd.fao_area_id] AS area_ids_2,
            FALSE AS reassign_to_unknown_fishing_entity,
-           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
-           hd.undeclared_eezs AS internal_audit_undeclared_eezs,
+           IF(cardinality(hd.access_agreement_eezs) > 0, hd.access_agreement_eezs, NULL) AS internal_audit_has_agreement_eezs,
+           IF(cardinality(hd.undeclared_eezs) > 0, hd.undeclared_eezs, NULL) AS internal_audit_undeclared_eezs,
            hd.fishing_entity_id,
            hd.year,
            hd.ices_area,
@@ -158,7 +158,7 @@ FROM (
            hd.ccamlr_area,
            hd.nafo_division
     FROM hybrid_data hd
-    JOIN eez_nafo_combo enc ON (enc.nafo_division = hd.nafo_division AND enc.is_ifa = FALSE)
+    JOIN sedna.eez_nafo_combo enc ON (enc.nafo_division = hd.nafo_division AND enc.is_ifa = FALSE)
     WHERE hd.nafo_division IS NOT NULL
       AND hd.fao_area_id = 21
     GROUP BY 1,2,4,5,6,7,8,9,10,11,12,13,14
@@ -170,8 +170,8 @@ FROM (
            if(hd.fao_area_id != 37,2,0) AS marine_layer_id_2,
            if(hd.fao_area_id != 37,ARRAY[hd.fao_area_id],ARRAY[]) AS area_ids_2,
            FALSE AS reassign_to_unknown_fishing_entity,
-           hd.access_agreement_eezs AS internal_audit_has_agreement_eezs,
-           hd.undeclared_eezs AS internal_audit_undeclared_eezs,
+           IF(cardinality(hd.access_agreement_eezs) > 0, hd.access_agreement_eezs, NULL) AS internal_audit_has_agreement_eezs,
+           IF(cardinality(hd.undeclared_eezs) > 0, hd.undeclared_eezs, NULL) AS internal_audit_undeclared_eezs,
            hd.fishing_entity_id,
            hd.year,
            hd.ices_area,
