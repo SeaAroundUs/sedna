@@ -68,7 +68,7 @@ def main():
     view_export()
     setup_athena()
     # test_tables()
-    # data_preprocess()
+    data_preprocess()
     # allocation()
 
 
