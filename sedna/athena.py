@@ -129,6 +129,17 @@ def create_simple_area_cell_assignment_table():
     run_query(sql)
 
 
+# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+# !!! NOTE !!! if this table needs to be recreated for a run then underlying
+#              ctas.hybrid_to_simple_area_mapper folder must be deleted in S3 as well
+def create_hybrid_to_simple_area_mapper_table():
+    wait_for_table('allocation_simple_area')
+    wait_for_table('allocation_hybrid_area')
+    print('Creating hybrid_to_simple_area_mapper table from query...')
+    sql = read_sql_file('create_hybrid_to_simple_area_mapper_table.sql')
+    run_query(sql)
+
+
 def test_tables():
     print('Testing tables...\n---')
     sql = 'SHOW TABLES IN sedna;'

@@ -49,6 +49,7 @@ def data_preprocess():
     athena.create_data_table()
     athena.create_allocation_unique_area_table()
     athena.create_simple_area_cell_assignment_table()
+    athena.create_hybrid_to_simple_area_mapper_table()
     # athena.create_allocation_unique_area_cell_table() # TODO reimplement function logic
 
 
