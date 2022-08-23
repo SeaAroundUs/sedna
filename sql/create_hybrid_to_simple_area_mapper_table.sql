@@ -3,7 +3,7 @@
 -- and https://github.com/SeaAroundUs/MerlinCSharp_MSSQL/blob/a90ee38b5b9fc7827803b6a267c4e681a764bfa2/Resolve999/step4/HybridToSimpleAreaMapper.cs
 CREATE TABLE IF NOT EXISTS sedna.hybrid_to_simple_area_mapper
 WITH (
-  external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.hybrid_to_simple_mapper',
+  external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.hybrid_to_simple_area_mapper',
   format = 'PARQUET',
   parquet_compression = 'SNAPPY'
 )
