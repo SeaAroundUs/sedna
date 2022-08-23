@@ -55,6 +55,7 @@ def create_core_tables():
             run_query(sql)
     print('---')
 
+# TODO DRY UP THESE CTAS!
 
 # ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
 # !!! NOTE !!! if this table needs to be recreated for a run then underlying
@@ -139,6 +140,26 @@ def create_hybrid_to_simple_area_mapper_table():
     sql = read_sql_file('create_hybrid_to_simple_area_mapper_table.sql')
     run_query(sql)
 
+
+# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+# !!! NOTE !!! if this table needs to be recreated for a run then underlying
+#              ctas.depth_adjustment_function_area folder must be deleted in S3 as well
+def create_depth_adjustment_function_area_table():
+    # TODO wait for tables
+    print('Creating depth_adjustment_function_area table from query...')
+    sql = read_sql_file('create_depth_adjustment_function_area_table.sql')
+    run_query(sql)
+
+
+# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+# !!! NOTE !!! if this table needs to be recreated for a run then underlying
+#              ctas.cells_for_area_type_3 folder must be deleted in S3 as well
+def create_cells_for_area_type_3_table():
+    wait_for_table('simple_area_cell_assignment')
+    wait_for_table('depth_adjustment_function_area')
+    print('Creating cells_for_area_type_3 table from query...')
+    sql = read_sql_file('create_cells_for_area_type_3_table.sql')
+    run_query(sql)
 
 def test_tables():
     print('Testing tables...\n---')
