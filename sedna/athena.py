@@ -144,8 +144,20 @@ def create_hybrid_to_simple_area_mapper_table():
 # ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
 # !!! NOTE !!! if this table needs to be recreated for a run then underlying
 #              ctas.depth_adjustment_function_area folder must be deleted in S3 as well
+def create_depth_adjustment_function_create_areas_table():
+    wait_for_table('simple_area_cell_assignment')
+    wait_for_table('allocation_simple_area')
+    print('Creating depth_adjustment_function_create_areas table from query...')
+    sql = read_sql_file('create_depth_adjustment_function_create_areas_table.sql')
+    run_query(sql)
+
+
+# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
+# !!! NOTE !!! if this table needs to be recreated for a run then underlying
+#              ctas.depth_adjustment_function_area folder must be deleted in S3 as well
 def create_depth_adjustment_function_area_table():
     wait_for_table('data')
+    wait_for_table('depth_adjustment_function_create_areas')  # TODO handlge long wait here ~20m
     print('Creating depth_adjustment_function_area table from query...')
     sql = read_sql_file('create_depth_adjustment_function_area_table.sql')
     run_query(sql)

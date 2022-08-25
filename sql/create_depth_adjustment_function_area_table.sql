@@ -15,8 +15,8 @@ AS WITH qualifying_rows AS (
            d.taxon_key,
            d.catch_amount
     FROM sedna.data d
-    JOIN taxon t ON (d.taxon_key = t.taxon_key)
-    JOIN functional_groups fg ON (t.functional_group_id = fg.functional_group_id)
+    JOIN sedna.taxon t ON (d.taxon_key = t.taxon_key)
+    JOIN sedna.functional_groups fg ON (t.functional_group_id = fg.functional_group_id)
     WHERE d.allocation_area_type_id = 1
       AND d.data_layer_id = 1
       AND d.sector_type_id = 1
@@ -73,21 +73,10 @@ AS WITH qualifying_rows AS (
 )
 SELECT row_number() OVER () AS depth_adjustment_function_area_id,
        dat.allocation_simple_area_id,
-       NULL AS local_depth_adjustment_row_id, --TODO DepthAdjustmentFunction_CreateAreas
+       dafca.local_depth_adjustment_row_id,
        dat.taxon_key,
-       NULL AS coverage_ratio, --TODO DepthAdjustmentFunction_CreateAreas
-       NULL AS min_possible_row --TODO DepthAdjustmentFunction_CreateAreas
+       dafca.ratio AS coverage_ratio,
+       dafca.min_possible_row
 FROM distinct_area_taxon dat
---TODO CROSS APPLY DepthAdjustmentFunction_CreateAreas
-
---TODO EXEC dbo.DepthAdjustmentFunction_MatchToAreaType3
---TODO EXEC Allocation_Populate_SpatialAutoGenTables
-
-
--- table shape
--- 	[DepthAdjustmentFunction_AreaID] [int] IDENTITY(1,1) NOT NULL,
--- 	[AllocationSimpleAreaID] [int] NOT NULL,
--- 	[LocalDepthAdjustmenRowID] [int] NOT NULL,
--- 	[TaxonKey] [int] NOT NULL,
--- 	[CoverageRatio] [float] NOT NULL,
--- 	[MinPossibleRow] [int] NOT NULL,
+JOIN sedna.depth_adjustment_function_create_areas dafca
+  ON (dat.taxon_key = dafca.taxon_key AND dat.allocation_simple_area_id = dafca.allocation_simple_area_id);
