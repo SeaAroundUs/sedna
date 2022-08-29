@@ -1,4 +1,4 @@
-import argparse
+# import argparse
 import sedna.athena as athena
 import sedna.iam as iam
 import sedna.kms as kms
@@ -15,49 +15,31 @@ def check_prereqs():
 
 
 def permissions():
-    # export_policy = iam.get_or_create_export_policy()
-    # export_role = iam.get_or_create_export_role()
-    # iam.attach_export_policy_to_role(export_policy)
-    pass
+    export_policy = iam.get_or_create_export_policy()
+    _export_role = iam.get_or_create_export_role()
+    iam.attach_export_policy_to_role(export_policy)
 
 
 def snapshot_export():
-    # key_id = kms.get_or_create_export_key()
-    # snapshot_arn = rds.get_or_create_snapshot()
-    # rds.get_or_create_export(snapshot_arn, export_role.name, key_id)
-    pass
+    key_id = kms.get_or_create_export_key()
+    snapshot_arn = rds.get_or_create_snapshot()
+    rds.get_or_create_export(snapshot_arn, export_role.name, key_id)
 
 
 def view_export():
-    # rds_to_s3_policy = iam.get_or_create_rds_to_s3_policy()
-    # role = iam.get_or_create_rds_to_s3_role()
-    # iam.attach_rds_to_s3_policy_to_role(rds_to_s3_policy)
-    # rds.attach_rds_to_s3_role_to_db(role)
-    # rds.export_views()
-    pass
+    rds_to_s3_policy = iam.get_or_create_rds_to_s3_policy()
+    role = iam.get_or_create_rds_to_s3_role()
+    iam.attach_rds_to_s3_policy_to_role(rds_to_s3_policy)
+    rds.attach_rds_to_s3_role_to_db(role)
+    rds.export_views()
 
 
+# none of these tables should require other CTAS tables to run
 def setup_athena():
-    athena.create_database()
-    athena.create_core_tables()
-    athena.create_dataraw_table()
-    athena.create_allocation_simple_area_table()
-    athena.create_allocation_hybrid_area_table()
-
-
-def data_preprocess():
-    athena.create_data_table()
-    athena.create_simple_area_cell_assignment_table()
-    athena.create_depth_adjustment_function_create_areas_table()
-    athena.create_depth_adjustment_function_area_table()
-    athena.create_allocation_unique_area_table()
-    athena.create_hybrid_to_simple_area_mapper_table()
-    # athena.create_cells_for_area_type_3_table
-    # athena.create_allocation_unique_area_cell_table() # TODO reimplement function logic
-
-
-def test_tables():
-    athena.test_tables()
+    # athena.create_database()
+    # athena.test_tables()
+    # athena.create_core_tables()
+    athena.create_all_ctas_tables()
 
 
 def allocation():
@@ -66,14 +48,12 @@ def allocation():
 
 def main():
     # TODO handle args with argparse
-    check_prereqs()
-    permissions()
-    snapshot_export()
-    view_export()
+    # check_prereqs()
+    # permissions()
+    # snapshot_export()
+    # view_export()
     setup_athena()
-    # test_tables()
-    data_preprocess()
-    # allocation()
+    allocation()
 
 
 if __name__ == '__main__':

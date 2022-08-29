@@ -1,6 +1,24 @@
 import boto3
 import time
+from collections import OrderedDict
 from sedna.common import read_sql_file, REGION_NAME, RESULT_CONFIGURATION
+
+# CTA table : pre-req CTAS tables
+CTAS = OrderedDict()
+CTAS['dataraw'] = []
+CTAS['allocation_simple_area'] = []
+CTAS['simple_area_cell_assignment'] = ['allocation_simple_area']
+CTAS['allocation_hybrid_area'] = ['dataraw']
+CTAS['hybrid_to_simple_area_mapper'] = ['allocation_simple_area', 'allocation_hybrid_area']
+CTAS['predepth_data'] = ['dataraw', 'allocation_simple_area', 'allocation_hybrid_area']
+CTAS['depth_adjustment_function_eligible_rows'] = ['predepth_data']
+CTAS['depth_adjustment_function_create_areas'] = ['allocation_simple_area', 'simple_area_cell_assignment']
+CTAS['depth_adjustment_function_area'] = ['predepth_data', 'depth_adjustment_function_eligible_rows',
+                                          'depth_adjustment_function_create_areas']
+# TODO CTAS['data'] = ['predepth_data', 'depth_adjustment_function_eligible_rows', 'depth_adjustment_function_area']
+# CTAS['allocation_unique_area'] = ['data']
+# TODO CTAS['cells_for_area_type_3'] = []
+# TODO CTAS['allocation_unique_area_cell'] = ['']
 
 
 def run_query(sql):
@@ -20,20 +38,24 @@ def get_query_results(qid):
     return athena.get_query_results(QueryExecutionId=qid)
 
 
-def wait_for_table(table, tries=24, timeout=5):
-    print(f'Waiting for creation of {table} table to finish...', end='', flush=True)
-    sql = f"SHOW TABLES IN sedna '{table}';"
+def wait_for_tables(tables, tries=60, timeout=30):
+    if len(tables) == 0:
+        return  # early return if nothing to wait on
+    tables_display = ', '.join(tables)
+    tables_regex = '|'.join(tables)
+    print(f'Waiting for creation of {tables_display} table(s) to finish...', end='', flush=True)
+    sql = f"SHOW TABLES IN sedna '{tables_regex}';"
     attempt = 0
     while attempt < tries:
         qid = run_query(sql)
         result = get_query_results(qid)
-        if len(result['ResultSet']['Rows']) > 0:
+        if len(result['ResultSet']['Rows']) == len(tables):
             print('done!')
             return
         print('.', end='')
         time.sleep(timeout)
         attempt += 1
-    raise Exception(f'Ran out of tries waiting for {table} ({tries} tries of {timeout}s);' +
+    raise Exception(f'Ran out of tries waiting for {tables_display} ({tries} tries of {timeout}s);' +
                     'try increasing number of tries or timeout')
 
 
@@ -55,123 +77,17 @@ def create_core_tables():
             run_query(sql)
     print('---')
 
-# TODO DRY UP THESE CTAS!
 
 # ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
 # !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.dataraw folder must be deleted in S3 as well
-def create_dataraw_table():
-    print('Creating dataraw table from query...')
-    sql = read_sql_file('create_dataraw_table.sql')
-    run_query(sql)
-
-
-# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
-# !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.allocation_simple_area folder must be deleted in S3 as well
-def create_allocation_simple_area_table():
-    print('Creating allocation simple area table from query...')
-    sql = read_sql_file('create_allocation_simple_area_table.sql')
-    run_query(sql)
-
-
-# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
-# !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.allocation_hybrid_area folder must be deleted in S3 as well
-def create_allocation_hybrid_area_table():
-    wait_for_table('dataraw')
-    print('Creating allocation hybrid area table from query...')
-    sql = read_sql_file('create_allocation_hybrid_area_table.sql')
-    run_query(sql)
-
-
-# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
-# !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.data folder must be deleted in S3 as well
-def create_data_table():
-    wait_for_table('allocation_hybrid_area')
-    wait_for_table('allocation_simple_area')
-    wait_for_table('dataraw')
-    print('Creating data table from query (this one takes a while)...')
-    sql = read_sql_file('create_data_table.sql')
-    run_query(sql)
-
-
-# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
-# !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.allocation_unique_area folder must be deleted in S3 as well
-def create_allocation_unique_area_table():
-    wait_for_table('data', tries=20, timeout=30)
-    print('Creating allocation unique area table from query...')
-    sql = read_sql_file('create_allocation_unique_area_table.sql')
-    run_query(sql)
-
-
-# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
-# !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.allocation_unique_area folder must be deleted in S3 as well
-def create_allocation_unique_area_cell_table():
-    wait_for_table('allocation_unique_area')
-    wait_for_table('simple_area_cell_assignment')
-    wait_for_table('hybrid_to_simple_area_mapper')
-    wait_for_table('cells_for_area_type_3')
-    print('Creating allocation unique area cell table from query...')
-    sql = read_sql_file('create_allocation_unique_area_cell_table.sql')
-    run_query(sql)
-
-
-# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
-# !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.simple_area_cell_assignment folder must be deleted in S3 as well
-def create_simple_area_cell_assignment_table():
-    wait_for_table('allocation_simple_area')
-    print('Creating simple_area_cell_assignment table from query...')
-    sql = read_sql_file('create_simple_area_cell_assignment_table.sql')
-    run_query(sql)
-
-
-# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
-# !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.hybrid_to_simple_area_mapper folder must be deleted in S3 as well
-def create_hybrid_to_simple_area_mapper_table():
-    wait_for_table('allocation_simple_area')
-    wait_for_table('allocation_hybrid_area')
-    print('Creating hybrid_to_simple_area_mapper table from query...')
-    sql = read_sql_file('create_hybrid_to_simple_area_mapper_table.sql')
-    run_query(sql)
-
-
-# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
-# !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.depth_adjustment_function_area folder must be deleted in S3 as well
-def create_depth_adjustment_function_create_areas_table():
-    wait_for_table('simple_area_cell_assignment')
-    wait_for_table('allocation_simple_area')
-    print('Creating depth_adjustment_function_create_areas table from query...')
-    sql = read_sql_file('create_depth_adjustment_function_create_areas_table.sql')
-    run_query(sql)
-
-
-# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
-# !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.depth_adjustment_function_area folder must be deleted in S3 as well
-def create_depth_adjustment_function_area_table():
-    wait_for_table('data')
-    wait_for_table('depth_adjustment_function_create_areas')  # TODO handlge long wait here ~20m
-    print('Creating depth_adjustment_function_area table from query...')
-    sql = read_sql_file('create_depth_adjustment_function_area_table.sql')
-    run_query(sql)
-
-
-# ctas reference: https://docs.aws.amazon.com/athena/latest/ug/ctas.html
-# !!! NOTE !!! if this table needs to be recreated for a run then underlying
-#              ctas.cells_for_area_type_3 folder must be deleted in S3 as well
-def create_cells_for_area_type_3_table():
-    wait_for_table('simple_area_cell_assignment')
-    wait_for_table('depth_adjustment_function_area')
-    print('Creating cells_for_area_type_3 table from query...')
-    sql = read_sql_file('create_cells_for_area_type_3_table.sql')
-    run_query(sql)
+#              ctas.<table> folder must be deleted in S3 as well
+def create_all_ctas_tables():
+    for table in CTAS:
+        reqs = CTAS[table]
+        wait_for_tables(reqs)
+        print(f'Creating {table} from query...')
+        sql = read_sql_file(f'ctas/{table}.sql')
+        run_query(sql)
 
 
 def test_tables():
