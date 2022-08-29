@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS sedna.dataraw
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.dataraw',
   format = 'PARQUET',
-  parquet_compression = 'SNAPPY'
+  write_compression = 'SNAPPY'
 )
 AS SELECT
     row_number() OVER () AS universal_data_id, *

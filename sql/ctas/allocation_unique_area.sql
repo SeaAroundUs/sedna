@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS sedna.allocation_unique_area
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.allocation_unique_area',
   format = 'PARQUET',
-  parquet_compression = 'SNAPPY'
+  write_compression = 'SNAPPY'
 )
 AS SELECT DISTINCT unique_area_id,
 	data_layer_id,

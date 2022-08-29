@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS sedna.depth_adjustment_function_create_areas
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.depth_adjustment_function_create_areas',
   format = 'PARQUET',
-  parquet_compression = 'SNAPPY'
+  write_compression = 'SNAPPY'
 )
 AS WITH possible_combos AS (
     SELECT DISTINCT saca.allocation_simple_area_id,

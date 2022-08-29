@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS sedna.cells_for_area_type_3
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.cells_for_area_type_3',
   format = 'PARQUET',
-  parquet_compression = 'SNAPPY'
+  write_compression = 'SNAPPY'
 )
 AS SELECT NULL --TODO
 

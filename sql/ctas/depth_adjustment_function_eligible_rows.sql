@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS sedna.depth_adjustment_function_eligible_rows
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.depth_adjustment_function_eligible_rows',
   format = 'PARQUET',
-  parquet_compression = 'SNAPPY'
+  write_compression = 'SNAPPY'
 )
 AS WITH qualifying_rows AS (
     SELECT d.universal_data_id,

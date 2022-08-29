@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS sedna.simple_area_cell_assignment
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.simple_area_cell_assignment',
   format = 'PARQUET',
-  parquet_compression = 'SNAPPY'
+  write_compression = 'SNAPPY'
 )
 AS SELECT
     row_number() OVER () AS row_id,

@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS sedna.allocation_hybrid_area
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.allocation_hybrid_area',
   format = 'PARQUET',
-  parquet_compression = 'SNAPPY'
+  write_compression = 'SNAPPY'
 )
 AS WITH access_agreement_eezs AS (
     SELECT dr.universal_data_id, array_agg(DISTINCT aa.eez_id) as access_agreement_eezs

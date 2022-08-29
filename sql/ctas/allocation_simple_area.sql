@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS sedna.allocation_simple_area
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.allocation_simple_area',
   format = 'PARQUET',
-  parquet_compression = 'SNAPPY'
+  write_compression = 'SNAPPY'
 )
 AS SELECT row_number() OVER () AS allocation_simple_area_id,
           marine_layer_id,

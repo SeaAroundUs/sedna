@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS sedna.data
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.data',
   format = 'PARQUET',
-  parquet_compression = 'SNAPPY'
+  write_compression = 'SNAPPY'
 ) AS WITH matching_coverage_ratio AS (
     SELECT dafer.universal_data_id,
            MIN(dafa.coverage_ratio) AS ratio
