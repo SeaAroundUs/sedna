@@ -16,6 +16,11 @@ CTAS['depth_adjustment_function_create_areas'] = ['allocation_simple_area', 'sim
 CTAS['depth_adjustment_function_area'] = ['predepth_data', 'depth_adjustment_function_eligible_rows',
                                           'depth_adjustment_function_create_areas']
 # TODO CTAS['data'] = ['predepth_data', 'depth_adjustment_function_eligible_rows', 'depth_adjustment_function_area']
+
+# TODO THEN (this updates the autogen tables), is this one needed? is it already done?
+# TODO EXEC Allocation_Populate_SpatialAutoGenTables
+# TODO https://github.com/SeaAroundUs/Merlin-database-mssql/blob/4b223108bad7e6863e7feae853053778026568c8/sprocs.sql#L63
+
 # CTAS['allocation_unique_area'] = ['data']
 # TODO CTAS['cells_for_area_type_3'] = []
 # TODO CTAS['allocation_unique_area_cell'] = ['']
