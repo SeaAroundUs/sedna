@@ -10,8 +10,9 @@ WITH (
            MIN(dafa.coverage_ratio) AS ratio
     FROM sedna.depth_adjustment_function_eligible_rows dafer
     JOIN sedna.depth_adjustment_function_area dafa
-      ON (dafer.generic_allocation_area_id = dafa.allocation_simple_area_id AND dafer.taxon_key = dafa.taxon_key)
-    WHERE dafer.peak_catch_ratio = dafa.covere_ratio
+      ON (dafer.generic_allocation_area_id = dafa.allocation_simple_area_id AND
+          dafer.taxon_key = dafa.taxon_key)
+    WHERE dafer.peak_catch_ratio = dafa.coverage_ratio
     GROUP BY dafa.unviversal_data_id
 ), matched_area_type_3 AS (
     SELECT dafer.universal_data_id,

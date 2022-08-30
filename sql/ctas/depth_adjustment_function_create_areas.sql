@@ -4,7 +4,10 @@ CREATE TABLE IF NOT EXISTS sedna.depth_adjustment_function_create_areas
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.depth_adjustment_function_create_areas',
   format = 'PARQUET',
-  write_compression = 'SNAPPY'
+  write_compression = 'SNAPPY',
+  bucketed_by = ARRAY['allocation_simple_area_id', 'taxon_key'],
+  bucket_count = 25
+  --TODO work on this one, its taking >20min
 )
 AS WITH possible_combos AS (
     SELECT DISTINCT saca.allocation_simple_area_id,
@@ -43,4 +46,5 @@ SELECT pcc.allocation_simple_area_id,
        pca.min_possible_row
     FROM possible_combos_cumulative pcc
     JOIN possible_combo_aggregates pca
-      ON (pcc.allocation_simple_area_id = pca.allocation_simple_area_id AND pcc.taxon_key = pca.taxon_key);
+      ON (pcc.allocation_simple_area_id = pca.allocation_simple_area_id AND
+          pcc.taxon_key = pca.taxon_key);

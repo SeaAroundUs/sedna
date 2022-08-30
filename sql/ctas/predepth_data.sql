@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS sedna.predepth_data
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.predepth_data',
   format = 'PARQUET',
-  write_compression = 'SNAPPY'
+  write_compression = 'SNAPPY',
+  partitioned_by = ARRAY['allocation_area_type_id', 'data_layer_id']
 )
 AS SELECT
        dense_rank() OVER (ORDER BY data_layer_id, allocation_area_type_id, generic_allocation_area_id) AS unique_area_id,
@@ -66,9 +67,9 @@ AS SELECT
            st.sector_type_id,
            dr.taxon_key AS taxon_key,
            dr.year AS year,
-           -- these columns listed last for partitioning
+           -- partition columns at the end
            IF(eez_id = 999, 2, 1) AS allocation_area_type_id,
-           dr.layer AS data_layer_id,
+           dr.layer AS data_layer_id
     FROM sedna.dataraw dr
     LEFT JOIN sedna.allocation_hybrid_area aha ON (
         dr.area_type = 'Hybrid' AND

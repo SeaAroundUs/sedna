@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS sedna.dataraw
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.dataraw',
   format = 'PARQUET',
-  write_compression = 'SNAPPY'
+  write_compression = 'SNAPPY',
+  partitioned_by = ARRAY['area_type']
+  --TODO bucket as well to speed up predepth_data
 )
 AS SELECT
     row_number() OVER () AS universal_data_id, *
@@ -30,16 +32,6 @@ AS SELECT
             NULL AS big_cell_id,
             c.ccamlr_area,
             na.nafo_division,
-            CASE
-                WHEN c.eez_id = 999 THEN 'Hybrid'
-                WHEN c.fao_area_id = 21 AND na.nafo_division IS NOT NULL THEN 'NAFO'
-                WHEN c.fao_area_id IN (48, 58, 88) AND c.ccamlr_area IS NOT NULL THEN 'CCAMLR'
-                WHEN c.fao_area_id = 27 THEN 'ICES'
-                WHEN c.eez_id = 0 AND c.fao_area_id > 0 THEN 'High Seas'
-                WHEN c.eez_id > 0 AND c.fao_area_id > 0 AND c.sector_type_id != 1 THEN 'IFA'
-                WHEN c.eez_id > 0 AND c.fao_area_id > 0 AND c.sector_type_id = 1 THEN 'EEZ'
-                ELSE NULL -- this shouldn't happen
-            END AS area_type,
             CASE
                 -- Hybrid
                 WHEN c.eez_id = 999
@@ -75,7 +67,18 @@ AS SELECT
                 WHEN c.eez_id > 0 AND c.fao_area_id > 0 AND c.sector_type_id = 1
                 THEN c.eez_id
                 ELSE NULL -- this shouldn't happen
-            END AS area_id
+            END AS area_id,
+            -- partition columns at the end
+            CASE
+                WHEN c.eez_id = 999 THEN 'Hybrid'
+                WHEN c.fao_area_id = 21 AND na.nafo_division IS NOT NULL THEN 'NAFO'
+                WHEN c.fao_area_id IN (48, 58, 88) AND c.ccamlr_area IS NOT NULL THEN 'CCAMLR'
+                WHEN c.fao_area_id = 27 THEN 'ICES'
+                WHEN c.eez_id = 0 AND c.fao_area_id > 0 THEN 'High Seas'
+                WHEN c.eez_id > 0 AND c.fao_area_id > 0 AND c.sector_type_id != 1 THEN 'IFA'
+                WHEN c.eez_id > 0 AND c.fao_area_id > 0 AND c.sector_type_id = 1 THEN 'EEZ'
+                ELSE NULL -- this shouldn't happen
+            END AS area_type
         FROM sedna.catch c
         JOIN sedna.time y ON (y.year = c.year AND y.is_used_for_allocation)
         JOIN sedna.sector_type st ON (st.sector_type_id = c.sector_type_id)
@@ -110,8 +113,9 @@ AS SELECT
             d.big_cell_id,
             NULL AS ccamlr_area,
             NULL AS nafo_division,
-            'Hybrid' AS area_type,
-            NULL AS area_id
+            NULL AS area_id,
+            -- partition columns at the end
+            'Hybrid' AS area_type
         FROM sedna.data_raw_layer3 d
         JOIN sedna.time y ON (y.year = d.year AND y.is_used_for_allocation)
         JOIN sedna.big_cell bc ON (bc.big_cell_id = d.big_cell_id AND bc.is_land_locked = FALSE)

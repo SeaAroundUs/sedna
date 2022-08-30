@@ -92,6 +92,7 @@ def create_all_ctas_tables():
         wait_for_tables(reqs)
         print(f'Creating {table} from query...')
         sql = read_sql_file(f'ctas/{table}.sql')
+        # TODO inject a comment at the top of the file with a filterable run value
         run_query(sql)
 
 

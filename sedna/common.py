@@ -15,6 +15,7 @@ BUCKET_NAME = os.getenv('BUCKET_NAME', 'sedna-catshark-storage')
 
 # athena
 RESULT_CONFIGURATION = {'OutputLocation': f's3://{BUCKET_NAME}/query_results/'}
+# TODO make the database name a passable value so we support more than one run at once?
 
 # rds
 EXPORT_S3_PATH = 'sedna-exports'
