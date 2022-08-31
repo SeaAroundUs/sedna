@@ -13,9 +13,9 @@ CTAS['hybrid_to_simple_area_mapper'] = ['allocation_simple_area', 'allocation_hy
 CTAS['predepth_data'] = ['dataraw', 'allocation_simple_area', 'allocation_hybrid_area']
 CTAS['depth_adjustment_function_eligible_rows'] = ['predepth_data']
 CTAS['depth_adjustment_function_area_possible_combos'] = ['simple_area_cell_assignment', 'allocation_simple_area']
-# CTAS['depth_adjustment_function_create_areas'] = ['depth_adjustment_function_area_possible_combos']
-# CTAS['depth_adjustment_function_area'] = ['predepth_data', 'depth_adjustment_function_eligible_rows',
-#                                           'depth_adjustment_function_create_areas']
+CTAS['depth_adjustment_function_create_areas'] = ['depth_adjustment_function_area_possible_combos']
+CTAS['depth_adjustment_function_area'] = ['predepth_data', 'depth_adjustment_function_eligible_rows',
+                                          'depth_adjustment_function_create_areas']
 # TODO CTAS['data'] = ['predepth_data', 'depth_adjustment_function_eligible_rows', 'depth_adjustment_function_area']
 
 # TODO THEN (this updates the autogen tables), is this one needed? is it already done?

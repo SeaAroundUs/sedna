@@ -7,7 +7,7 @@ WITH (
   format = 'PARQUET',
   write_compression = 'SNAPPY',
   bucketed_by = ARRAY['allocation_simple_area_id', 'taxon_key'],
-  bucket_count = 25
+  bucket_count = 50
 )
 AS WITH distinct_area_taxon AS (
     SELECT DISTINCT d.generic_allocation_area_id AS allocation_simple_area_id,
