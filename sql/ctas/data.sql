@@ -5,7 +5,9 @@ WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.data',
   format = 'PARQUET',
   write_compression = 'SNAPPY',
-  partitioned_by = ARRAY['allocation_area_type_id', 'data_layer_id']
+  partitioned_by = ARRAY['allocation_area_type_id', 'data_layer_id'],
+  bucketed_by = ARRAY['unique_area_id'],
+  bucket_count = 25
 ) AS WITH matching_coverage_ratio AS (
     SELECT dafer.universal_data_id,
            MIN(dafa.coverage_ratio) AS ratio

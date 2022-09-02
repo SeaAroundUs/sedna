@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS sedna.allocation_unique_area_cell
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.allocation_unique_area_cell',
   format = 'PARQUET',
-  write_compression = 'SNAPPY'
+  write_compression = 'SNAPPY',
+  bucketed_by = ARRAY['unique_area_id'],
+  bucket_count = 25
 ) AS SELECT aua.unique_area_id,
             cga.allocation_simple_area_id,
             cga.cell_id,
