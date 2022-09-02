@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS sedna.data
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.data',
   format = 'PARQUET',
-  write_compression = 'SNAPPY'
+  write_compression = 'SNAPPY',
+  partitioned_by = ARRAY['allocation_area_type_id', 'data_layer_id']
 ) AS WITH matching_coverage_ratio AS (
     SELECT dafer.universal_data_id,
            MIN(dafa.coverage_ratio) AS ratio
@@ -12,11 +13,13 @@ WITH (
     JOIN sedna.depth_adjustment_function_area dafa
       ON (dafer.generic_allocation_area_id = dafa.allocation_simple_area_id AND
           dafer.taxon_key = dafa.taxon_key)
-    WHERE dafer.peak_catch_ratio = dafa.coverage_ratio
-    GROUP BY dafa.unviversal_data_id
+    WHERE dafer.peak_catch_ratio_ratchet_effect <= dafa.coverage_ratio
+    GROUP BY dafer.universal_data_id
 ), matched_area_type_3 AS (
     SELECT dafer.universal_data_id,
-           dafa.depth_adjustment_function_area_id
+           dafa.depth_adjustment_function_area_id,
+           3 AS depth_allocation_area_type,
+           TRUE AS internal_audit_depth_function_override
     FROM matching_coverage_ratio mcr
     JOIN sedna.depth_adjustment_function_eligible_rows dafer
       ON (mcr.universal_data_id = dafer.universal_data_id)
@@ -25,24 +28,23 @@ WITH (
           dafa.taxon_key = dafer.taxon_key AND
           dafa.coverage_ratio = mcr.ratio)
 )
-
-SELECT * FROM matched_area_type_3 limit 100;
-
--- with matching_CoverageRatio as
--- 	( select universalDataID, min(a.coverageRatio) as MatchedCoverageRatio
--- 	 from [dbo].[DepthAdjustmentFunction_EligibleRowsOfData] e inner join
--- 	 [dbo].[DepthAdjustmentFunction_Area] a on
--- 	 e.[GenericAllocationAreaID] = a.[AllocationSimpleAreaID] and e.TaxonKey = a.taxonkey
--- 	where  e.PeakCatchRatio <= a.CoverageRatio
--- 		group by universalDataID
--- 	),
--- 	Matched_AreaType3 as (select e.UniversalDataID, a.[DepthAdjustmentFunction_AreaID]
--- 	from  matching_CoverageRatio m inner join [dbo].[DepthAdjustmentFunction_EligibleRowsOfData] e
--- 	on m.universalDataID = e.universalDataID
--- 	inner join [dbo].[DepthAdjustmentFunction_Area] a
--- 	on a.[AllocationSimpleAreaID] = e.GenericAllocationAreaID and a.TaxonKey = e.taxonkey and a.CoverageRatio = m.MatchedCoverageRatio
--- 	)
--- Update dbo.data
--- set AllocationAreaTypeID = 3,
--- GenericAllocationAreaID = m.[DepthAdjustmentFunction_AreaID]
--- from dbo.data d inner join Matched_AreaType3 m on d.UniversalDataID = m.UniversalDataID
+SELECT pd.unique_area_id,
+       pd.universal_data_id,
+       pd.area_type,
+       COALESCE(mat.depth_adjustment_function_area_id, pd.generic_allocation_area_id) AS generic_allocation_area_id,
+       pd.original_fishing_entity_id,
+       pd.fishing_entity_id,
+       pd.catch_amount,
+       pd.catch_type_id,
+       pd.reporting_status_id,
+       pd.gear_type_id,
+       pd.input_type_id,
+       pd.sector_type_id,
+       pd.taxon_key,
+       pd.year,
+       COALESCE(mat.internal_audit_depth_function_override, FALSE) AS internal_audit_depth_function_override,
+       -- partition columns at the end
+       COALESCE(mat.depth_allocation_area_type, pd.allocation_area_type_id) AS allocation_area_type_id,
+       pd.data_layer_id
+FROM sedna.predepth_data pd
+LEFT JOIN matched_area_type_3 mat ON (mat.universal_data_id = pd.universal_data_id);

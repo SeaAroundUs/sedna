@@ -9,21 +9,33 @@ CTAS['dataraw'] = []
 CTAS['allocation_simple_area'] = []
 CTAS['simple_area_cell_assignment'] = ['allocation_simple_area']
 CTAS['allocation_hybrid_area'] = ['dataraw']
-CTAS['hybrid_to_simple_area_mapper'] = ['allocation_simple_area', 'allocation_hybrid_area']
-CTAS['predepth_data'] = ['dataraw', 'allocation_simple_area', 'allocation_hybrid_area']
+CTAS['hybrid_to_simple_area_mapper'] = ['allocation_simple_area',
+                                        'allocation_hybrid_area']
+CTAS['predepth_data'] = ['dataraw',
+                         'allocation_simple_area',
+                         'allocation_hybrid_area']
 CTAS['depth_adjustment_function_eligible_rows'] = ['predepth_data']
-CTAS['depth_adjustment_function_area_possible_combos'] = ['simple_area_cell_assignment', 'allocation_simple_area']
+CTAS['depth_adjustment_function_area_possible_combos'] = ['simple_area_cell_assignment',
+                                                          'allocation_simple_area']
 CTAS['depth_adjustment_function_create_areas'] = ['depth_adjustment_function_area_possible_combos']
-CTAS['depth_adjustment_function_area'] = ['predepth_data', 'depth_adjustment_function_eligible_rows',
+CTAS['depth_adjustment_function_area'] = ['predepth_data',
+                                          'depth_adjustment_function_eligible_rows',
                                           'depth_adjustment_function_create_areas']
-# TODO CTAS['data'] = ['predepth_data', 'depth_adjustment_function_eligible_rows', 'depth_adjustment_function_area']
+CTAS['data'] = ['predepth_data',
+                'depth_adjustment_function_eligible_rows',
+                'depth_adjustment_function_area']
+CTAS['cells_for_area_type_3'] = ['simple_area_cell_assignment',
+                                 'allocation_simple_area',
+                                 'depth_adjustment_function_area']
+CTAS['cells_for_generic_area'] = ['simple_area_cell_assignment',
+                                  'hybrid_to_simple_area_mapper',
+                                  'cells_for_area_type_3']
 
-# TODO THEN (this updates the autogen tables), is this one needed? is it already done?
+# TODO THEN (this updates the other autogen tables), is this one needed? is it already done?
 # TODO EXEC Allocation_Populate_SpatialAutoGenTables
 # TODO https://github.com/SeaAroundUs/Merlin-database-mssql/blob/4b223108bad7e6863e7feae853053778026568c8/sprocs.sql#L63
 
 # CTAS['allocation_unique_area'] = ['data']
-# TODO CTAS['cells_for_area_type_3'] = []
 # TODO CTAS['allocation_unique_area_cell'] = ['']
 
 
