@@ -13,7 +13,7 @@ WITH (
            saca.cell_id,
            saca.water_area
     FROM sedna.simple_area_cell_assignment saca
-), area_type_2_cells AS (
+), area_type_2_cells AS ( -- this takes ~5min
     SELECT hsam.hybrid_area_id AS generic_area_id,
            2 AS allocation_area_type_id,
            saca.allocation_simple_area_id,
@@ -57,11 +57,69 @@ SELECT generic_area_id,
        allocation_area_type_id,
        1 AS data_layer_id
 FROM area_type_3_cells
-
---TODO data_layer_id 2 with coastal cells removed if not allowed via:
--- JOIN sedna.allocation_simple_area asa
---   ON (saca.allocation_simple_area_id = asa.allocation_simple_area_id)
--- WHERE asa.inherited_att_allows_coastal_fishing_for_layer2_data = 1
---    OR saca.cell_id NOT IN (SELECT cell_id FROM sedna.cell_is_coastal)
-
---TODO data_layer_id 3 (coastal cell removal is commented out in code)
+UNION ALL -- data layer 2
+SELECT atc.generic_area_id,
+       atc.allocation_simple_area_id,
+       atc.cell_id,
+       atc.water_area,
+       -- partition columns at the end
+       atc.allocation_area_type_id,
+       2 AS data_layer_id
+FROM area_type_1_cells atc
+JOIN sedna.allocation_simple_area asa
+  ON (atc.allocation_simple_area_id = asa.allocation_simple_area_id)
+WHERE asa.inherited_att_allows_coastal_fishing_for_layer2_data = 1
+   OR atc.cell_id NOT IN (SELECT cell_id FROM sedna.cell_is_coastal)
+UNION ALL
+SELECT atc.generic_area_id,
+       atc.allocation_simple_area_id,
+       atc.cell_id,
+       atc.water_area,
+       -- partition columns at the end
+       atc.allocation_area_type_id,
+       2 AS data_layer_id
+FROM area_type_2_cells atc
+JOIN sedna.allocation_simple_area asa
+  ON (atc.allocation_simple_area_id = asa.allocation_simple_area_id)
+WHERE asa.inherited_att_allows_coastal_fishing_for_layer2_data = 1
+   OR atc.cell_id NOT IN (SELECT cell_id FROM sedna.cell_is_coastal)
+UNION ALL
+SELECT atc.generic_area_id,
+       atc.allocation_simple_area_id,
+       atc.cell_id,
+       atc.water_area,
+       -- partition columns at the end
+       atc.allocation_area_type_id,
+       2 AS data_layer_id
+FROM area_type_3_cells atc
+JOIN sedna.allocation_simple_area asa
+  ON (atc.allocation_simple_area_id = asa.allocation_simple_area_id)
+WHERE asa.inherited_att_allows_coastal_fishing_for_layer2_data = 1
+   OR atc.cell_id NOT IN (SELECT cell_id FROM sedna.cell_is_coastal)
+UNION ALL -- data layer 3 (coastal cell removal is commented out in merlin code)
+SELECT generic_area_id,
+       allocation_simple_area_id,
+       cell_id,
+       water_area,
+       -- partition columns at the end
+       allocation_area_type_id,
+       3 AS data_layer_id
+FROM area_type_1_cells
+UNION ALL
+SELECT generic_area_id,
+       allocation_simple_area_id,
+       cell_id,
+       water_area,
+       -- partition columns at the end
+       allocation_area_type_id,
+       3 AS data_layer_id
+FROM area_type_2_cells
+UNION ALL
+SELECT generic_area_id,
+       allocation_simple_area_id,
+       cell_id,
+       water_area,
+       -- partition columns at the end
+       allocation_area_type_id,
+       3 AS data_layer_id
+FROM area_type_3_cells;

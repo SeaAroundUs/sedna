@@ -5,13 +5,12 @@ WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.allocation_unique_area_cell',
   format = 'PARQUET',
   write_compression = 'SNAPPY'
-)
-SELECT aua.unique_area_id,
-       cga.allocation_simple_id,
-       cga.cell_id,
-       cga.water_area
+) AS SELECT aua.unique_area_id,
+            cga.allocation_simple_area_id,
+            cga.cell_id,
+            cga.water_area
 FROM sedna.allocation_unique_area aua
-JOIN cells_for_generic_area cga
+JOIN sedna.cells_for_generic_area cga
   ON (aua.generic_allocation_area_id = cga.generic_area_id AND
       aua.allocation_area_type_id = cga.allocation_area_type_id AND
       aua.data_layer_id = cga.data_layer_id);

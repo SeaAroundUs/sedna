@@ -31,8 +31,8 @@ CTAS['cells_for_generic_area'] = ['simple_area_cell_assignment',
                                   'hybrid_to_simple_area_mapper',
                                   'cells_for_area_type_3']
 CTAS['allocation_unique_area'] = ['data']
-# TODO CTAS['allocation_unique_area_cell'] = ['allocation_unique_area',
-#                                        'cells_for_generic_area']
+CTAS['allocation_unique_area_cell'] = ['allocation_unique_area',
+                                       'cells_for_generic_area']
 
 
 def run_query(sql):
