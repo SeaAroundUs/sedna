@@ -1,33 +1,17 @@
 -- allocation unique area cell table
--- from https://github.com/SeaAroundUs/Merlin-database-mssql/blob/4b223108bad7e6863e7feae853053778026568c8/sprocs.sql#L83
--- and https://github.com/SeaAroundUs/Merlin-database-mssql/blob/4b223108bad7e6863e7feae853053778026568c8/functions.sql#L251
+-- https://github.com/SeaAroundUs/Merlin-database-mssql/blob/4b223108bad7e6863e7feae853053778026568c8/sprocs.sql#L83
 CREATE TABLE IF NOT EXISTS sedna.allocation_unique_area_cell
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.allocation_unique_area_cell',
   format = 'PARQUET',
   write_compression = 'SNAPPY'
 )
-AS SELECT seca.allocation_simple_area_id,
-          seca.cell_id,
-          seca.water_area
+SELECT aua.unique_area_id,
+       cga.allocation_simple_id,
+       cga.cell_id,
+       cga.water_area
 FROM sedna.allocation_unique_area aua
-JOIN sedna.simple_area_cell_assignment seca
- ON (aua.generic_allocation_area_id = seca.allocation_simple_area_id)
-WHERE aua.allocation_area_type_id = 1
-UNION ALL
-SELECT seca.allocation_simple_area_id,
-       seca.cell_id,
-       seca.water_area
-FROM sedna.allocation_unique_area aua
-JOIN sedna.hybrid_to_simple_area_mapper hsam
-  ON (aua.generic_allocation_area_id = hsam.hybrid_area_id)
-JOIN sedna.simple_area_cell_assignment seca
-  ON (hsam.contains_simple_area_id = seca.allocation_simple_area_id)
-WHERE aua.allocation_area_type_id = 2
--- UNION ALL
--- SELECT seca.allocation_simple_area_id,
---        seca.cell_id,
---        seca.water_area
--- FROM sedna.allocation_unique_area aua
--- TODO JOIN SOME STUFF
--- WHERE aua.allocation_area_type_id = 3 --TODO type 3 uses GetCellsForAreaType3
+JOIN cells_for_generic_area cga
+  ON (aua.generic_allocation_area_id = cga.generic_area_id AND
+      aua.allocation_area_type_id = cga.allocation_area_type_id AND
+      aua.data_layer_id = cga.data_layer_id);

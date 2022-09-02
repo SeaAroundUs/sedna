@@ -28,23 +28,26 @@ WITH (
           dafa.taxon_key = dafer.taxon_key AND
           dafa.coverage_ratio = mcr.ratio)
 )
-SELECT pd.unique_area_id,
-       pd.universal_data_id,
-       pd.area_type,
-       COALESCE(mat.depth_adjustment_function_area_id, pd.generic_allocation_area_id) AS generic_allocation_area_id,
-       pd.original_fishing_entity_id,
-       pd.fishing_entity_id,
-       pd.catch_amount,
-       pd.catch_type_id,
-       pd.reporting_status_id,
-       pd.gear_type_id,
-       pd.input_type_id,
-       pd.sector_type_id,
-       pd.taxon_key,
-       pd.year,
-       COALESCE(mat.internal_audit_depth_function_override, FALSE) AS internal_audit_depth_function_override,
-       -- partition columns at the end
-       COALESCE(mat.depth_allocation_area_type, pd.allocation_area_type_id) AS allocation_area_type_id,
-       pd.data_layer_id
-FROM sedna.predepth_data pd
-LEFT JOIN matched_area_type_3 mat ON (mat.universal_data_id = pd.universal_data_id);
+SELECT dense_rank() OVER (ORDER BY data_layer_id, allocation_area_type_id, generic_allocation_area_id) AS unique_area_id,
+       *
+FROM (
+    SELECT pd.universal_data_id,
+           pd.area_type,
+           COALESCE(mat.depth_adjustment_function_area_id, pd.generic_allocation_area_id) AS generic_allocation_area_id,
+           pd.original_fishing_entity_id,
+           pd.fishing_entity_id,
+           pd.catch_amount,
+           pd.catch_type_id,
+           pd.reporting_status_id,
+           pd.gear_type_id,
+           pd.input_type_id,
+           pd.sector_type_id,
+           pd.taxon_key,
+           pd.year,
+           COALESCE(mat.internal_audit_depth_function_override, FALSE) AS internal_audit_depth_function_override,
+           -- partition columns at the end
+           COALESCE(mat.depth_allocation_area_type, pd.allocation_area_type_id) AS allocation_area_type_id,
+           pd.data_layer_id
+    FROM sedna.predepth_data pd
+    LEFT JOIN matched_area_type_3 mat ON (mat.universal_data_id = pd.universal_data_id)
+);

@@ -7,7 +7,7 @@ WITH (
   format = 'PARQUET',
   write_compression = 'SNAPPY',
   bucketed_by = ARRAY['allocation_simple_area_id'],
-  bucket_count = 10
+  bucket_count = 75
 )
 AS SELECT
     row_number() OVER () AS row_id,

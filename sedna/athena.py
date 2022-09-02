@@ -30,13 +30,9 @@ CTAS['cells_for_area_type_3'] = ['simple_area_cell_assignment',
 CTAS['cells_for_generic_area'] = ['simple_area_cell_assignment',
                                   'hybrid_to_simple_area_mapper',
                                   'cells_for_area_type_3']
-
-# TODO THEN (this updates the other autogen tables), is this one needed? is it already done?
-# TODO EXEC Allocation_Populate_SpatialAutoGenTables
-# TODO https://github.com/SeaAroundUs/Merlin-database-mssql/blob/4b223108bad7e6863e7feae853053778026568c8/sprocs.sql#L63
-
-# CTAS['allocation_unique_area'] = ['data']
-# TODO CTAS['allocation_unique_area_cell'] = ['']
+CTAS['allocation_unique_area'] = ['data']
+# TODO CTAS['allocation_unique_area_cell'] = ['allocation_unique_area',
+#                                        'cells_for_generic_area']
 
 
 def run_query(sql):
@@ -136,5 +132,5 @@ def test_tables():
 
 def drop_all_ctas_tables():
     for table in CTAS:
-        sql = f'DROP TABLE {table};'
+        sql = f'DROP TABLE sedna.{table};'
         run_query(sql)

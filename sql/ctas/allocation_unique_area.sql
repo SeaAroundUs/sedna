@@ -7,8 +7,8 @@ WITH (
   write_compression = 'SNAPPY'
 )
 AS SELECT DISTINCT unique_area_id,
-	data_layer_id,
-	allocation_area_type_id,
-	generic_allocation_area_id
+                   data_layer_id,
+                   allocation_area_type_id,
+                   generic_allocation_area_id
 FROM sedna.data
 ORDER BY unique_area_id;

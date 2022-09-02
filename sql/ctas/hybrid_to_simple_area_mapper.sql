@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS sedna.hybrid_to_simple_area_mapper
 WITH (
   external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.hybrid_to_simple_area_mapper',
   format = 'PARQUET',
-  write_compression = 'SNAPPY'
+  write_compression = 'SNAPPY',
+  bucketed_by = ARRAY['contains_simple_area_id'],
+  bucket_count = 75
 )
 AS SELECT row_number() OVER () AS row_id, *
 FROM (
