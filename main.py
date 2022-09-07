@@ -35,16 +35,18 @@ def view_export():
     rds.export_views()
 
 
-# none of these tables should require other CTAS tables to run
 def setup_athena():
     # athena.create_database()
     # athena.test_tables()
     # athena.create_core_tables()
     athena.create_all_ctas_tables()
+    athena.create_allocation_statement()
 
 
 def allocation():
-    pass  # TODO
+    # TODO loop over fishing entities
+    #    athena.run_allocation_statement(fishing_entity_id)
+    pass
 
 
 def main():

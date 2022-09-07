@@ -105,6 +105,24 @@ def create_all_ctas_tables():
         run_query(sql)
 
 
+def create_allocation_statement():
+    athena = boto3.client('athena', region_name=REGION_NAME)
+    result = athena.list_prepared_statements(WorkGroup='primary')
+    sts = (st['StatementName'] for st in result['PreparedStatements'])
+    if 'allocation_results' in sts:
+        return  # statement already exists
+    sql = read_sql_file('allocation.sql')
+    athena.create_prepared_statement(
+        StatementName='allocation_results',
+        WorkGroup='primary',
+        QueryStatement=sql
+    )
+
+
+def run_allocation_statement(fishing_entity_id):
+    pass  # TODO
+
+
 def test_tables():
     print('Testing tables...\n---')
     sql = 'SHOW TABLES IN sedna;'

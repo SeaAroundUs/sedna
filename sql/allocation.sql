@@ -1,7 +1,5 @@
--- allocation process
+-- parameterized allocation process statement
 -- from https://github.com/SeaAroundUs/Merlin-database-mssql/blob/4b223108bad7e6863e7feae853053778026568c8/sprocs.sql#L15
--- TODO query times out work on this, individual original_fishing_entity take 10-210s and there are ~200 of them
---  the approach here should be outputting to an exportable format and iterating through fishing entities
 WITH results AS (
     SELECT d.universal_data_id,
            d.unique_area_id,
@@ -15,6 +13,7 @@ WITH results AS (
       ON (d.unique_area_id = auac.unique_area_id)
     JOIN sedna.taxon_distribution td
       ON (auac.cell_id = td.cell_id AND d.taxon_key = td.taxon_key)
+    WHERE original_fishing_entity_id = ?
 ), sum_relative_abundance AS (
     SELECT r.universal_data_id,
            SUM(r.water_area_x_relative_abundance) AS sum_relative_abundance
