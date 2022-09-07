@@ -13,10 +13,6 @@ ACCOUNT_ID = boto3.client('sts').get_caller_identity()['Account']
 # s3
 BUCKET_NAME = os.getenv('BUCKET_NAME', 'sedna-catshark-storage')
 
-# athena
-RESULT_CONFIGURATION = {'OutputLocation': f's3://{BUCKET_NAME}/query_results/'}
-# TODO make the database name a passable value so we support more than one run at once?
-
 # rds
 EXPORT_S3_PATH = 'sedna-exports'
 EXPORT_DATABASE = os.getenv('EXPORT_DATABASE', 'seaaroundus')
@@ -47,6 +43,11 @@ RDS_TO_S3_ROLE_NAME = 'sedna-rds-to-s3-role'
 # kms
 EXPORT_KEY_NAME = 'sedna-export-key'
 KEY_DESCRIPTION = 'Key for encrypting RDS snapshot exports to S3'
+
+# athena
+RESULT_CONFIGURATION = {'OutputLocation': f's3://{BUCKET_NAME}/query_results/'}
+ALLOCATION_RESULT_PATH = f'{EXPORT_S3_PATH}/{EXPORT_TASK_NAME}/allocation_result'
+# TODO make the database name a passable value so we support more than one run at once?
 
 
 def read_sql_file(filename, replace=True):

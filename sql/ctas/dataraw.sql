@@ -9,7 +9,7 @@ WITH (
   format = 'PARQUET',
   write_compression = 'SNAPPY',
   partitioned_by = ARRAY['area_type']
-  --TODO bucket as well to speed up predepth_data
+  --TODO bucket as well to speed up predepth_data?
 )
 AS SELECT
     row_number() OVER () AS universal_data_id, *

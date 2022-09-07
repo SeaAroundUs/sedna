@@ -7,7 +7,7 @@ WITH (
   write_compression = 'SNAPPY',
   partitioned_by = ARRAY['allocation_area_type_id', 'data_layer_id'],
   bucketed_by = ARRAY['unique_area_id'],
-  bucket_count = 25
+  bucket_count = 100
 ) AS WITH matching_coverage_ratio AS (
     SELECT dafer.universal_data_id,
            MIN(dafa.coverage_ratio) AS ratio

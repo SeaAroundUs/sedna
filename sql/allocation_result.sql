@@ -1,12 +1,8 @@
 -- allocation process
 -- from https://github.com/SeaAroundUs/Merlin-database-mssql/blob/4b223108bad7e6863e7feae853053778026568c8/sprocs.sql#L15
-CREATE TABLE IF NOT EXISTS sedna.allocation_result
-WITH (
-  external_location = 's3://{BUCKET_NAME}/{PARQUET_PREFIX}/ctas.allocation_result',
-  format = 'PARQUET',
-  write_compression = 'SNAPPY'
-)
-AS WITH results AS (
+-- TODO query times out work on this, individual original_fishing_entity take 10-210s and there are ~200 of them
+--  the approach here should be outputting to an exportable format and iterating through fishing entities
+WITH results AS (
     SELECT d.universal_data_id,
            d.unique_area_id,
            auac.allocation_simple_area_id,
@@ -24,7 +20,7 @@ AS WITH results AS (
            SUM(r.water_area_x_relative_abundance) AS sum_relative_abundance
     FROM results r
     GROUP BY 1
-    HAVING sum_relative_abundance > 0
+    HAVING SUM(r.water_area_x_relative_abundance) > 0
 )
 SELECT r.universal_data_id,
        r.allocation_simple_area_id,

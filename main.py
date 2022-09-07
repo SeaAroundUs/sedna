@@ -16,11 +16,12 @@ def check_prereqs():
 
 def permissions():
     export_policy = iam.get_or_create_export_policy()
-    _export_role = iam.get_or_create_export_role()
+    _ = iam.get_or_create_export_role()
     iam.attach_export_policy_to_role(export_policy)
 
 
 def snapshot_export():
+    export_role = iam.get_or_create_export_role()
     key_id = kms.get_or_create_export_key()
     snapshot_arn = rds.get_or_create_snapshot()
     rds.get_or_create_export(snapshot_arn, export_role.name, key_id)
