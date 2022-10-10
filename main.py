@@ -1,4 +1,5 @@
 # import argparse
+import concurrent.futures
 import sedna.athena as athena
 import sedna.iam as iam
 import sedna.kms as kms
@@ -44,8 +45,9 @@ def setup_athena():
 
 def allocation():
     print('Beginning ALLOCATION!\n---')
-    for fishing_entity_id, name in athena.get_fishing_entities():
-        athena.allocation_result(fishing_entity_id, name)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        ids, names = zip(*athena.get_fishing_entities())
+        executor.map(athena.allocation_result, ids, names)
     print('ALLOCATION COMPLETE!')
 
 

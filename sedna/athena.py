@@ -136,14 +136,13 @@ def allocation_result(fishing_entity_id, name):
     if folder_exists_and_not_empty(export_folder):
         print(f'Skipping {name} (ID {fishing_entity_id}); already exists')
         return
-    print(f'Running allocation for {name} (ID {fishing_entity_id})...', end='', flush=True)
+    print(f'Starting allocation for {name} (ID {fishing_entity_id})...')
     sql = read_sql_file('allocation.sql', True, fishing_entity_id=fishing_entity_id)
     start = time.perf_counter()
     qid = run_query(sql, f's3://{BUCKET_NAME}/{export_folder}', fishing_entity_id)
-    # TODO make async and run indefinitely and in parallel
     get_query_results(qid)
     elapsed = time.perf_counter() - start
-    print(f'done (took {elapsed:.2f}s)')
+    print(f'{name} (ID {fishing_entity_id}) done! Execution took {elapsed:.2f}s')
 
 
 def test_tables():
