@@ -1,4 +1,4 @@
--- parameterized allocation process statement
+-- allocation result for fishing_entity {fishing_entity_id}
 -- from https://github.com/SeaAroundUs/Merlin-database-mssql/blob/4b223108bad7e6863e7feae853053778026568c8/sprocs.sql#L15
 WITH results AS (
     SELECT d.universal_data_id,
@@ -21,10 +21,10 @@ WITH results AS (
     GROUP BY 1
     HAVING SUM(r.water_area_x_relative_abundance) > 0
 )
-SELECT r.universal_data_id,
-       r.allocation_simple_area_id,
-       r.cell_id,
-       r.total_catch / sra.sum_relative_abundance
+SELECT r.universal_data_id AS universal_data_id,
+       r.allocation_simple_area_id AS allocation_simple_id,
+       r.cell_id AS cell_id,
+       r.total_catch / sra.sum_relative_abundance AS allocated_catch
 FROM results r
 JOIN sum_relative_abundance sra
   ON (r.universal_data_id = sra.universal_data_id);

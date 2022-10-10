@@ -40,13 +40,13 @@ def setup_athena():
     # athena.test_tables()
     # athena.create_core_tables()
     athena.create_all_ctas_tables()
-    athena.create_allocation_statement()
 
 
 def allocation():
-    # TODO loop over fishing entities
-    #    athena.run_allocation_statement(fishing_entity_id)
-    pass
+    print('Beginning ALLOCATION!\n---')
+    for fishing_entity_id, name in athena.get_fishing_entities():
+        athena.allocation_result(fishing_entity_id, name)
+    print('ALLOCATION COMPLETE!')
 
 
 def main():
@@ -55,7 +55,7 @@ def main():
     # permissions()
     # snapshot_export()
     # view_export()
-    setup_athena()
+    # setup_athena()
     allocation()
 
 

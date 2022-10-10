@@ -1,7 +1,8 @@
 import boto3
 import time
 from collections import OrderedDict
-from sedna.common import read_sql_file, REGION_NAME, RESULT_CONFIGURATION
+from sedna.common import read_sql_file, REGION_NAME, RESULT_CONFIGURATION, ALLOCATION_RESULT_PREFIX, BUCKET_NAME
+from sedna.s3 import folder_exists_and_not_empty
 
 # CTA table : pre-req CTAS tables
 CTAS = OrderedDict()
@@ -35,9 +36,14 @@ CTAS['allocation_unique_area_cell'] = ['allocation_unique_area',
                                        'cells_for_generic_area']
 
 
-def run_query(sql):
+def run_query(sql, output_location=None, *args):
     athena = boto3.client('athena', region_name=REGION_NAME)
-    query = athena.start_query_execution(QueryString=sql, ResultConfiguration=RESULT_CONFIGURATION)
+    query_kwargs = {'QueryString': sql, 'ResultConfiguration': RESULT_CONFIGURATION}
+    if output_location:
+        query_kwargs['ResultConfiguration']['OutputLocation'] = output_location
+    if len(args):
+        query_kwargs['ExecutionParameters'] = args
+    query = athena.start_query_execution(**query_kwargs)
     return query['QueryExecutionId']
 
 
@@ -66,7 +72,7 @@ def wait_for_tables(tables, tries=60, timeout=30):
         if len(result['ResultSet']['Rows']) == len(tables):
             print('done!')
             return
-        print('.', end='')
+        print('.', end='', flush=True)
         time.sleep(timeout)
         attempt += 1
     raise Exception(f'Ran out of tries waiting for {tables_display} ({tries} tries of {timeout}s);' +
@@ -105,22 +111,39 @@ def create_all_ctas_tables():
         run_query(sql)
 
 
-def create_allocation_statement():
-    athena = boto3.client('athena', region_name=REGION_NAME)
-    result = athena.list_prepared_statements(WorkGroup='primary')
-    sts = (st['StatementName'] for st in result['PreparedStatements'])
-    if 'allocation_results' in sts:
-        return  # statement already exists
-    sql = read_sql_file('allocation.sql')
-    athena.create_prepared_statement(
-        StatementName='allocation_results',
-        WorkGroup='primary',
-        QueryStatement=sql
-    )
+def get_fishing_entities():
+    print('Grabbing fishing entities...', end='', flush=True)
+    sql = '''
+        -- listing fishing entities for allocations
+        SELECT d.original_fishing_entity_id, fe.name, COUNT(1)
+        FROM sedna.data d
+        JOIN sedna.fishing_entity fe 
+          ON (d.original_fishing_entity_id = fe.fishing_entity_id)
+        GROUP BY 1, 2
+        ORDER BY COUNT(1) ASC;
+    '''
+    qid = run_query(sql)
+    result = get_query_results(qid)
+    fishing_entities = list((row['Data'][0]['VarCharValue'], row['Data'][1]['VarCharValue'])
+                            for row in result['ResultSet']['Rows'][1:])
+    print(f'found {len(fishing_entities)} rows')
+    # return fishing_entities
+    return fishing_entities[0:25]  # TODO just for testing
 
 
-def run_allocation_statement(fishing_entity_id):
-    pass  # TODO
+def allocation_result(fishing_entity_id, name):
+    export_folder = f'{ALLOCATION_RESULT_PREFIX}/fishing_entity_{fishing_entity_id}/'
+    if folder_exists_and_not_empty(export_folder):
+        print(f'Skipping {name} (ID {fishing_entity_id}); already exists')
+        return
+    print(f'Running allocation for {name} (ID {fishing_entity_id})...', end='', flush=True)
+    sql = read_sql_file('allocation.sql', True, fishing_entity_id=fishing_entity_id)
+    start = time.perf_counter()
+    qid = run_query(sql, f's3://{BUCKET_NAME}/{export_folder}', fishing_entity_id)
+    # TODO make async and run indefinitely and in parallel
+    get_query_results(qid)
+    elapsed = time.perf_counter() - start
+    print(f'done (took {elapsed:.2f}s)')
 
 
 def test_tables():
