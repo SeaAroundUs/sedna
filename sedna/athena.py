@@ -127,12 +127,11 @@ def get_fishing_entities():
     fishing_entities = list((row['Data'][0]['VarCharValue'], row['Data'][1]['VarCharValue'])
                             for row in result['ResultSet']['Rows'][1:])
     print(f'found {len(fishing_entities)} rows')
-    # return fishing_entities
-    return fishing_entities[0:25]  # TODO just for testing
+    return fishing_entities
 
 
 def allocation_result(fishing_entity_id, name):
-    export_folder = f'{ALLOCATION_RESULT_PREFIX}/fishing_entity_{fishing_entity_id}/'
+    export_folder = f'{ALLOCATION_RESULT_PREFIX}/fishing_entity_{fishing_entity_id:03}/'
     if folder_exists_and_not_empty(export_folder):
         print(f'Skipping {name} (ID {fishing_entity_id}); already exists')
         return
