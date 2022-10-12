@@ -16,8 +16,11 @@ BUCKET_NAME = os.getenv('BUCKET_NAME', 'sedna-catshark-storage')
 # rds
 EXPORT_S3_PATH = 'sedna-exports'
 EXPORT_DATABASE = os.getenv('EXPORT_DATABASE', 'seaaroundus')
-with open('.export_version') as f:
-    EXPORT_TASK_NAME = f'sedna-sau-int-export-{f.readline().strip()}'
+try:
+    with open('.export_version') as f:
+        EXPORT_TASK_NAME = f'sedna-sau-int-export-{f.readline().strip()}'
+except OSError:
+    raise Exception(f'Missing .export_version file; please use the configuration described in README.md')
 PARQUET_PREFIX = f'{EXPORT_S3_PATH}/{EXPORT_TASK_NAME}/{EXPORT_DATABASE}'
 DATABASE_ID = 'sedna-catshark-dev'
 SNAPSHOT_ID = 'sedna-snapshot'
@@ -62,9 +65,6 @@ def read_sql_file(filename, replace=True, **kwargs):
 
 
 def check_env_file():
-    env_vals = ['REGION_NAME', 'BUCKET_NAME', 'EXPORT_DATABASE', 'EXPORT_HOST', 'EXPORT_USER', 'EXPORT_PASSWORD']
-    empty_vals = (v for v in env_vals if globals()[v] is None)
-    if empty_vals:
-        missing_vals = "\n".join(empty_vals)
-        raise Exception(f'''The following environmental variables are missing:\n {missing_vals};
-please use the .env file configuration described in README.md''')
+    env_vals = [REGION_NAME, BUCKET_NAME, EXPORT_DATABASE, EXPORT_HOST, EXPORT_USER, EXPORT_PASSWORD]
+    if any(not v for v in env_vals):
+        raise Exception(f'One or more .env variables are unset; please use the configuration described in README.md')

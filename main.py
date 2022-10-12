@@ -10,7 +10,6 @@ import sedna.rds as rds
 def check_prereqs():
     # check for env settings in file
     common.check_env_file()
-    # TODO check for export version file
     # TODO check for basic AWS access via boto
     # TODO check for existence of S3 bucket
     # TODO check for RDS access
