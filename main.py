@@ -49,7 +49,7 @@ def setup_athena():
     print('Beginning Athena setup...')
     athena.create_database()
     athena.create_core_tables()
-    athena.test_tables()
+    athena.test_imported_tables()
     athena.create_all_ctas_tables()  # TODO run these in a threadpool like allocation
     print('Athena setup complete!')
 

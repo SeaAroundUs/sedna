@@ -144,13 +144,13 @@ def allocation_result(fishing_entity_id, name):
     print(f'{name} (ID {fishing_entity_id}) done! Execution took {elapsed:.2f}s')
 
 
-def test_tables():
-    print('Testing tables...\n---')
+def test_imported_tables():
+    print('Testing imported tables...\n---')
     sql = 'SHOW TABLES IN sedna;'
-    # TODO exclude CTAS tables
     qid = run_query(sql)
     result = get_query_results(qid)
-    tables = [row['Data'][0]['VarCharValue'] for row in result['ResultSet']['Rows']]
+    tables = [row['Data'][0]['VarCharValue'] for row in result['ResultSet']['Rows']
+              if row['Data'][0]['VarCharValue'] not in CTAS.keys()]
     bad_tables = []
     for table in tables:
         print(f'Testing {table}...', end='', flush=True)
