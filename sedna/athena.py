@@ -81,7 +81,7 @@ def wait_for_tables(tables, tries=60, timeout=30):
 
 def create_database():
     print('Creating database in Athena...')
-    sql = read_sql_file('create_database.sql')
+    sql = 'CREATE DATABASE IF NOT EXISTS sedna;'
     run_query(sql)
 
 
@@ -147,6 +147,7 @@ def allocation_result(fishing_entity_id, name):
 def test_tables():
     print('Testing tables...\n---')
     sql = 'SHOW TABLES IN sedna;'
+    # TODO exclude CTAS tables
     qid = run_query(sql)
     result = get_query_results(qid)
     tables = [row['Data'][0]['VarCharValue'] for row in result['ResultSet']['Rows']]
