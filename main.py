@@ -5,12 +5,12 @@ import sedna.common as common
 import sedna.iam as iam
 import sedna.kms as kms
 import sedna.rds as rds
+import sedna.sts as sts
 
 
 def check_prereqs():
-    # check for env settings in file
     common.check_env_file()
-    # TODO check for basic AWS access via boto
+    sts.check_aws_access()
     # TODO check for existence of S3 bucket
     # TODO check for RDS access
     pass
