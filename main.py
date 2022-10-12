@@ -5,15 +5,15 @@ import sedna.common as common
 import sedna.iam as iam
 import sedna.kms as kms
 import sedna.rds as rds
+import sedna.s3 as s3
 import sedna.sts as sts
 
 
 def check_prereqs():
     common.check_env_file()
     sts.check_aws_access()
-    # TODO check for existence of S3 bucket
+    s3.check_for_sedna_bucket()
     # TODO check for RDS access
-    pass
 
 
 def permissions():

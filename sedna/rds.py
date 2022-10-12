@@ -1,4 +1,4 @@
-import botocore
+import botocore.exceptions as boto_exceptions
 import boto3
 import psycopg2
 import re
@@ -83,7 +83,7 @@ def attach_rds_to_s3_role_to_db(role):
             RoleArn=role.name,
             FeatureName='s3Export'
         )
-    except botocore.exceptions.ClientError as err:
+    except boto_exceptions.ClientError as err:
         msg = 'The engine PostgreSQL supports only one ARN associated with feature name s3Export.'
         if err.response['Error']['Message'] == msg:  # TODO find a more reliable way to check for this
             pass  # ignore if its already added

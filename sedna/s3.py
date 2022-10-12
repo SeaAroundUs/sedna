@@ -1,10 +1,15 @@
+import botocore.exceptions as boto_exceptions
 import boto3
 from sedna.common import BUCKET_NAME
 
 
 # check for existence of sedna bucket
 def check_for_sedna_bucket():
-    pass  # TODO
+    s3 = boto3.client('s3')
+    try:
+        s3.head_bucket(Bucket=BUCKET_NAME)
+    except boto_exceptions.ClientError:
+        raise Exception(f'Cannot access bucket "{BUCKET_NAME}"; please use the configuration described in README.md')
 
 
 # check if directory exists and is not empty
