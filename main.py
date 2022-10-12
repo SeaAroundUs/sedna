@@ -1,13 +1,15 @@
 # import argparse
 import concurrent.futures
 import sedna.athena as athena
+import sedna.common as common
 import sedna.iam as iam
 import sedna.kms as kms
 import sedna.rds as rds
 
 
 def check_prereqs():
-    # TODO check for env settings in file
+    # check for env settings in file
+    common.check_env_file()
     # TODO check for export version file
     # TODO check for basic AWS access via boto
     # TODO check for existence of S3 bucket
@@ -38,9 +40,9 @@ def view_export():
 
 def setup_athena():
     # athena.create_database()
-    # athena.test_tables()
     # athena.create_core_tables()
-    athena.create_all_ctas_tables()
+    # athena.test_tables()
+    athena.create_all_ctas_tables()  # TODO run these in a threadpool like allocation
 
 
 def allocation():
@@ -53,12 +55,12 @@ def allocation():
 
 def main():
     # TODO handle args with argparse
-    # check_prereqs()
+    check_prereqs()
     # permissions()
     # snapshot_export()
     # view_export()
     # setup_athena()
-    allocation()
+    # allocation()
 
 
 if __name__ == '__main__':

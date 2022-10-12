@@ -59,3 +59,12 @@ def read_sql_file(filename, replace=True, **kwargs):
         kwargs.update({'BUCKET_NAME': BUCKET_NAME, 'PARQUET_PREFIX': PARQUET_PREFIX})
         sql = sql.format(**kwargs)
     return sql
+
+
+def check_env_file():
+    env_vals = ['REGION_NAME', 'BUCKET_NAME', 'EXPORT_DATABASE', 'EXPORT_HOST', 'EXPORT_USER', 'EXPORT_PASSWORD']
+    empty_vals = (v for v in env_vals if globals()[v] is None)
+    if empty_vals:
+        missing_vals = "\n".join(empty_vals)
+        raise Exception(f'''The following environmental variables are missing:\n {missing_vals};
+please use the .env file configuration described in README.md''')
