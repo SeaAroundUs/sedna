@@ -10,6 +10,11 @@ Pre-requisites:
 - RDS access to the SAU PostgreSQL database
 - Ability to create additional IAM roles for Sedna usage
 
+Configuration:
+- Copy `.env_template` to `.env` and fill in appropriate values
+- Create an `.export_version` file with a short alphanumeric content (this will version your run of Sedna)
+- Run *in order* `check`, `perm`, `export`, `setup`, and finally `allocate` per the Usage section below
+
 Usage:
 ```
 $ python main.py
