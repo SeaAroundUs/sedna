@@ -17,3 +17,13 @@ def folder_exists_and_not_empty(path):
     s3 = boto3.client('s3')
     resp = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=path, MaxKeys=1)
     return 'Contents' in resp
+
+
+def get_csv_file_in_folder(path):
+    s3 = boto3.client('s3')
+    resp = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=path)
+    for file in resp['Contents']:
+        file_name = file['Key']
+        if file_name[-3:] == 'csv':
+            return file_name
+    raise Exception(f'No CSV found in {path}')

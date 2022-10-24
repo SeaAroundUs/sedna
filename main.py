@@ -55,7 +55,7 @@ def setup_athena():
 
 
 def allocation():
-    print('Saving allocation support tables...')
+    print('Saving allocation support tables...')  # TODO if this takes a while throw it in the thread pool
     for table_name in common.ALLOCATION_SUPPORT_TABLES:
         athena.save_allocation_support_table(table_name)
     print('Allocation support tables are all saved!')
@@ -64,6 +64,20 @@ def allocation():
         ids, names = zip(*athena.get_fishing_entities())
         executor.map(athena.allocation_result, ids, names)
     print('\nALLOCATION COMPLETE!')
+
+
+def generate_import():
+    print('Generating SQL for allocation result import...')
+    sql = common.read_sql_file('import.sql')
+    for table_name in common.ALLOCATION_SUPPORT_TABLES:
+        file_path = s3.get_csv_file_in_folder(f'{common.ALLOCATION_RESULT_PREFIX}/{table_name}')
+        sql = sql + rds.generate_allocation_table_import_sql(table_name, file_path) + '\n'
+    for (fishing_entity_id, _) in athena.get_fishing_entities():
+        file_path = s3.get_csv_file_in_folder(f'{common.ALLOCATION_RESULT_PREFIX}/fishing_entity_{fishing_entity_id}')
+        sql = sql + rds.generate_allocation_table_import_sql('allocation_result', file_path) + '\n'
+    with open('allocation_import.sql', 'w') as fd:
+        fd.write(sql)
+    print('Completed generating allocation_import.sql file!')
 
 
 def main():
@@ -80,6 +94,7 @@ Usage:
     export   - Export necessary data (views and snapshot) from RDS to S3
     setup    - Set up necessary Athena tables based off S3 data
     allocate - Run the allocation process
+    import   - Generate allocation result import SQL
 ''')
         exit(0)
 
@@ -98,6 +113,9 @@ Usage:
             exit(0)
         case 'allocate':
             allocation()
+            exit(0)
+        case 'import':
+            generate_import()
             exit(0)
         case _:
             print(f'Unknown command: {sys.argv[1]}')

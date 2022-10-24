@@ -90,3 +90,17 @@ def attach_rds_to_s3_role_to_db(role):
         else:
             print(err)
             exit(1)
+
+
+# table_import_from_s3 reference:
+# https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PostgreSQL.S3Import.html#aws_s3.table_import_from_s3
+def generate_allocation_table_import_sql(table_name, file_path):
+    return f'''SELECT aws_s3.table_import_from_s3(
+    '{table_name}', -- table name
+    '', -- column_list (empty means all columns) 
+    '(FORMAT CSV)', -- PostgreSQL COPY options
+    '{BUCKET_NAME}', -- s3 bucket name
+    '{file_path}', -- s3 file path
+    '{REGION_NAME}' -- s3 region
+    )
+);'''
