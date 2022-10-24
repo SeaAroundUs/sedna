@@ -55,11 +55,15 @@ def setup_athena():
 
 
 def allocation():
+    print('Saving allocation support tables...')
+    for table_name in common.ALLOCATION_SUPPORT_TABLES:
+        athena.save_allocation_support_table(table_name)
+    print('Allocation support tables are all saved!')
     print('Beginning ALLOCATION!\n---')
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         ids, names = zip(*athena.get_fishing_entities())
         executor.map(athena.allocation_result, ids, names)
-    print('ALLOCATION COMPLETE!')
+    print('\nALLOCATION COMPLETE!')
 
 
 def main():

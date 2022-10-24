@@ -50,7 +50,8 @@ KEY_DESCRIPTION = 'Key for encrypting RDS snapshot exports to S3'
 # athena
 RESULT_CONFIGURATION = {'OutputLocation': f's3://{BUCKET_NAME}/query_results/'}
 ALLOCATION_RESULT_PREFIX = f'{EXPORT_S3_PATH}/{EXPORT_TASK_NAME}/allocation_result'
-# TODO make the database name a passable value so we support more than one run at once?
+ALLOCATION_SUPPORT_TABLES = ['simple_area_cell_assignment', 'allocation_simple_area', 'cell', 'data']
+# TODO make the athena database name a passable value so we support more than one run at once?
 
 
 def read_sql_file(filename, replace=True, **kwargs):

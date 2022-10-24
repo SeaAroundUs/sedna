@@ -130,6 +130,18 @@ def get_fishing_entities():
     return fishing_entities
 
 
+def save_allocation_support_table(table_name):
+    print(f'Saving {table_name}...', end='', flush=True)
+    export_folder = f'{ALLOCATION_RESULT_PREFIX}/{table_name}/'
+    if folder_exists_and_not_empty(export_folder):
+        print(f'Skipping {table_name}; already exists')
+        return
+    sql = f'-- allocation support table {table_name}\nSELECT * FROM sedna.{table_name};'
+    qid = run_query(sql, f's3://{BUCKET_NAME}/{export_folder}')
+    get_query_results(qid)
+    print('saved', flush=True)
+
+
 def allocation_result(fishing_entity_id, name):
     export_folder = f'{ALLOCATION_RESULT_PREFIX}/fishing_entity_{fishing_entity_id:03}/'
     if folder_exists_and_not_empty(export_folder):
