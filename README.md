@@ -14,6 +14,8 @@ Configuration:
 - Copy `.env_template` to `.env` and fill in appropriate values
 - Create an `.export_version` file with a short alphanumeric content (this will version your run of Sedna)
 - Run *in order* `check`, `perm`, `export`, `setup`, and finally `allocate` per the Usage section below
+- Running the `import` step generates `allocation_import.sql` which can be used to import allocation results and
+associated supporting tables from Athena/S3 to RDS
 
 Usage:
 ```
@@ -30,6 +32,7 @@ Usage:
     export   - Export necessary data (views and snapshot) from RDS to S3
     setup    - Set up necessary Athena tables based off S3 data
     allocate - Run the allocation process
+    import   - Generate allocation result import SQL
 ```
 
 Check is optional, all other steps must be followed in sequence.
